@@ -1,0 +1,72 @@
+WITH customer_transactions AS (
+    -- Count the number of transactions per phone_number per month
+    SELECT 
+        phone_number, 
+        month, 
+        month_number,
+        COUNT(*) AS transaction_count
+    FROM 
+        bambaswap_combined_jan_sep_2024
+    GROUP BY 
+        phone_number, month, month_number
+),
+qualified_customers AS (
+    -- Filter for customers with more than 3 transactions per month
+    SELECT 
+        phone_number, 
+        month, 
+        month_number
+    FROM 
+        customer_transactions
+    WHERE 
+        transaction_count > 2
+),
+retained_customers AS (
+    -- Join the customers with consecutive months to find retained customers
+    SELECT 
+        q1.phone_number, 
+        q1.month_number,
+        q1.month AS current_month, 
+        q2.month AS next_month
+    FROM 
+        qualified_customers q1
+    INNER JOIN 
+        qualified_customers q2
+    ON 
+        q1.phone_number = q2.phone_number
+        AND q1.month_number = q2.month_number - 1  -- Check for consecutive months
+),
+churned_customers AS (
+    -- Find customers who churned (did not return in the next month)
+    SELECT 
+        q1.phone_number, 
+        q1.month_number,
+        q1.month AS current_month
+    FROM 
+        qualified_customers q1
+    LEFT JOIN 
+        retained_customers q2
+    ON 
+        q1.phone_number = q2.phone_number 
+        AND q1.month = q2.current_month
+    WHERE 
+        q2.phone_number IS NULL  -- Only include customers who did not return
+)
+-- Final calculation of the churn rate
+SELECT 
+    q1.month AS current_month, 
+    q1.month_number,
+    COUNT(DISTINCT q1.phone_number) AS total_customers,
+    COUNT(DISTINCT c.phone_number) AS churned_customers,
+    ROUND ((COUNT(DISTINCT c.phone_number) * 100.0) / COUNT(DISTINCT q1.phone_number),2) AS churn_rate
+FROM 
+    qualified_customers q1
+LEFT JOIN 
+    churned_customers c
+ON 
+    q1.phone_number = c.phone_number 
+    AND q1.month = c.current_month
+GROUP BY 
+    q1.month,q1.month_number
+ORDER BY 
+    q1.month_number;

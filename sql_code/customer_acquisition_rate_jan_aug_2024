@@ -1,0 +1,51 @@
+WITH monthly_customers AS (
+    -- Step 1: Get distinct customers for each month using the date_only column
+    SELECT DISTINCT phone_number, 
+           EXTRACT(MONTH FROM date_only) AS month_number,
+           TO_CHAR(date_only, 'Month') AS transaction_month  -- Get the month name from date_only
+    FROM bambaswap_combined_jan_sep_2024
+),
+new_customers_per_month AS (
+    -- Step 2: Find new customers in each month who did not appear in the previous month
+    SELECT mc.phone_number, 
+           mc.month_number,
+           mc.transaction_month,
+           LAG(mc.transaction_month) OVER (PARTITION BY mc.phone_number ORDER BY mc.month_number) AS previous_month
+    FROM monthly_customers mc
+),
+new_customers_by_month AS (
+    -- Step 3: Count new customers for each month
+    SELECT transaction_month, 
+           month_number,
+           COUNT(phone_number) AS new_customers
+    FROM new_customers_per_month
+    WHERE (previous_month IS NULL OR transaction_month != previous_month)  -- New customers who didn’t appear in the previous month
+    GROUP BY transaction_month, month_number
+),
+total_customers_by_month AS (
+    -- Step 4: Calculate total customers in each month
+    SELECT transaction_month, 
+           month_number,
+           COUNT(DISTINCT phone_number) AS total_customers
+    FROM monthly_customers
+    GROUP BY transaction_month, month_number
+),
+previous_month_customers AS (
+    -- Step 5: Calculate total customers for the previous month using LAG function
+    SELECT 
+        transaction_month,
+        month_number,
+        LAG(total_customers) OVER (ORDER BY month_number) AS previous_month_customers
+    FROM total_customers_by_month
+)
+-- Step 6: Calculate CAR by comparing new customers with the previous month's total customers
+SELECT 
+    n.transaction_month,
+    n.month_number,
+    n.new_customers,
+    p.previous_month_customers,
+    ROUND ((n.new_customers::NUMERIC / p.previous_month_customers) * 100,2) AS acquisition_rate
+FROM new_customers_by_month n
+JOIN previous_month_customers p ON n.transaction_month = p.transaction_month AND n.month_number = p.month_number
+WHERE p.previous_month_customers IS NOT NULL  -- Ensure we're excluding January
+ORDER BY n.month_number;
