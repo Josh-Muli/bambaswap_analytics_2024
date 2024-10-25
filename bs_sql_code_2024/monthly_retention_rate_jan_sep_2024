@@ -19,7 +19,7 @@ qualified_customers AS (
     FROM 
         customer_transactions
     WHERE 
-        transaction_count > 1
+        transaction_count > 3
 ),
 retained_customers AS (
     -- Join the customers with consecutive months to find retained customers
