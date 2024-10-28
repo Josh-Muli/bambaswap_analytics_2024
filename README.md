@@ -274,7 +274,7 @@ ORDER BY
 
 Here are three main summary insights from the Monthly Recurring Revenue (MRR) data for Bambaswap from January to September 2024:
 
-1. **MRR Decline in the First Quarter:** There was a noticeable decline in MRR from **January** *($1,163,542.32)* to **March** (*$1,031,313.14*). This could indicate a potential issue in customer retention or reduced business performance in the early part of the year.
+1. **MRR Decline in the First Quarter:** There was a noticeable decline in MRR from **January**  *($1,163,542.32)*  to **March**  *($1,031,313.14)*. This could indicate a potential issue in customer retention or reduced business performance in the early part of the year.
 2. **Missing MMR in April:** The absence of data for both **ARPU (Average Revenue per User)** and **MRR** in April stands out. This gap may indicate data collection issues or irregularities in revenue tracking for that month, which could affect trend analysis for the entire period. Or **No New Customer Acquisition:** that is if SwapFintech did not acquiring any new customers and all existing customers had either churned or did only one transaction in the period, hence the MRR dropped to zero.
 3. **Recovery and Stabilization in Later Months**: After the dip in **March**, MRR increases again in May (*$834,098.52*) and stabilizes around a similar range from **June** to **September,** fluctuating between approximately *$760,338* and *$856,160*. This suggests that after the initial drop, the revenue stabilizes, albeit at a lower level compared to the first quarter.
 
@@ -283,7 +283,7 @@ Here are three main summary insights from the Monthly Recurring Revenue (MRR) da
 **The Retention Rate (R.R)** is a metric used to measure the percentage of customers who remain active or continue using a service over a specific period of time. It is the opposite of the churn rate and is a critical indicator of customer loyalty and the effectiveness of a business in retaining its existing customers. In SwapFintech, loyal customers was measured by the number of customers who made more than three 3 transactions in a month.
 
 * **Identify Qualified Customers** : Customers who have made more than 3 transactions in a given month.
-* **Identify Retained Customers** : Customers who made more than 3 transactions in  **consecutive months** .
+* **Identify Retained Customers** : Customers who made more than 2 transactions in  **consecutive months** .
 * **Calculate Retention Rate** : For each month, calculate the Retention Rate as the percentage of **retained customers** (those with consecutive month activity) over the **total qualified customers** for that month.
 
 To calculate the **Retention Rate (R.R)**, you can use the following formula:
