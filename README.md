@@ -28,12 +28,12 @@ For my deep dive into the SwapFintech data analysis and KPI's, I harnessed the p
 
 Each query for this project aimed at investigating specific aspect of the SwapFintech KPI's. KPIs identified for the Swap Fintech to track progress and drive business growth include:-
 
-**1.	Customer Acquisition Rate (C.A.R)**
-**2.	Cusomer Conversion Rate (C.C.R)**
-**3.	Monthly Recurring Revenue (M.R.R)**
-**4.	Monthly Retention Rate (R.R)**
-**5.	Churn Rate (C.R)**
-**6.	Customer Lifetime Value (C.L.V)**
+- **Customer Acquisition Rate (C.A.R)**
+- **Cusomer Conversion Rate (C.C.R)**
+- **Monthly Recurring Revenue (M.R.R)**
+- **Monthly Retention Rate (R.R)**
+- **Churn Rate (C.R)**
+- **Customer Lifetime Value (C.L.V)**
 
 ### **1.	Customer Acquisition Rate (C.A.R)**
 
@@ -192,7 +192,7 @@ From the above customer conversion anaysis, the following conclusions were made 
 Here's a formula to calculate MRR:
 
 $$
-\mathit {MMR} = \mathit{ARPU\ } times \mathit{Number\ of\ Recurring\ Customers}
+\mathit {MMR} = \mathit{ARPU\ } X  {\mathit{Number\ of\ Recurring\ Customers}}
 $$
 
 Where:
