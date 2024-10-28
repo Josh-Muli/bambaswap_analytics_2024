@@ -1,39 +1,14 @@
-![](file:///C:/Users/JOSHMSI/AppData/Local/Temp/msohtmlclip1/01/clip_image001.gif)SWAPFINTECKPIANALYSIS
-
-![](file:///C:/Users/JOSHMSI/AppData/Local/Temp/msohtmlclip1/01/clip_image002.gif)![](file:///C:/Users/JOSHMSI/AppData/Local/Temp/msohtmlclip1/01/clip_image003.gif)Introduction
-
-Tools
-
-Used
-
-The Analysis
-
-1. Customer Acquisition Rate (C.A.R)
-2. Customer Conversion Rate (C.C.R)
-3. Monthly RecurringRevenue (M.R.R)
-4. Mothly Retention Rate (R.R)
-5. Churn Rate (C.R)
-6. Customer Lifetime Value (C.L.V)
-
-Conclusion
-
-# **SWAPFINTEC KPI ANALYSIS**
+**SWAPFINTEC KPI ANALYSIS**
 
 Period:  January - September 2024
 
 # **Introduction**
 
-SwapFintech is a Kenyan fintech startup that provides a platform for users to instantly convert their airtime
-to cash and purchase discounted airtime and data bundles. Founded with the mission of providing emergency cash
- to ordinary Kenyans, SwapFintech has quickly become a popular service in the country. One of SwapFintech’s key
-  features is its airtime-to-cash conversion service. Users can convert their Safaricom airtime to M-PESA cash
-  instantly, with a conversion fee of 30% and the user receiving 70% of the airtime value. The conversion process
-  takes less than a minute, making it a convenient option for those in need of quick cash.
+SwapFintech is a Kenyan fintech startup that provides a platform for users to instantly convert their airtime to cash and purchase discounted airtime and data bundles. Founded with the mission of providing emergency cash to ordinary Kenyans, SwapFintech has quickly become a popular service in the country. One of SwapFintech’s key   features is its airtime-to-cash conversion service. Users can convert their Safaricom airtime to M-PESA cash  instantly, with a conversion fee of 30% and the user receiving 70% of the airtime value. The conversion process  takes less than a minute, making it a convenient option for those in need of quick cash.
 
-In addition to the airtime-to-cash service, SwapFintech also offers discounted airtime and data bundles. Users can purchase Safaricom airtime at a 10-15% discount and data bundles at a 15% discount. This feature has made it a popular choice for those looking to save money on their airtime and data purchases. SwapFintech has also integrated with other services such as Fuliza and Okoa Jahazi, allowing users to buy airtime using these mobile lending services. This integration has further increased the platform's convenience and accessibility for Kenyan users. The company has a strong focus on user experience, with a user-friendly interface and fast transaction speeds. SwapFintech has also received positive reviews from users, who have praised the service for its reliability, competitive pricing, and excellent customer service.
+The report analyzes SwapFintech's customer acquisition, retention, and revenue metrics over a nine-month period, providing insight into the company's growth trajectory and customer engagement patterns. Key performance indicators (KPIs) such as Customer Acquisition Rate (C.A.R), Customer Conversion Rate (C.C.R), Monthly Recurring Revenue (M.R.R), Retention Rate (R.R), Churn Rate, and Customer Lifetime Value (CLV) were measured to assess the effectiveness of SwapFintech’s strategies in attracting, converting, and retaining customers. Early data highlights a period of strong growth in acquisition and conversion, followed by significant fluctuations in customer retention and revenue. These metrics reveal critical challenges and opportunities in sustaining customer engagement and maximizing revenue, offering actionable insights into optimizing SwapFintech's long-term growth and profitability. This report aims to provide a comprehensive overview of these trends and their implications for future strategic initiatives.
 
-As a result, this KPI analysis dives deep in a effort to understand the company's past trend, customer behavior, growth and progress;
- hence shade in light in the future plans. This analysis is done using the PostgreSql and you can find all the queries here: [Bambaswap Analysis 2024](/https://github.com/Josh-Muli/bambaswap_analytisc_2024/blob/df1a03cdf693e421f8e2e3caf670d7c8e0b01b71/bs_sql_code_2024/)
+ This analysis is done using the PostgreSql and you can find all the queries here: [Bambaswap Analysis 2024](/https://github.com/Josh-Muli/bambaswap_analytisc_2024/blob/df1a03cdf693e421f8e2e3caf670d7c8e0b01b71/bs_sql_code_2024/)
 
 # **Tools Used**
 
