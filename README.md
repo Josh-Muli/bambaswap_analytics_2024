@@ -1,14 +1,14 @@
-**SWAPFINTEC KPI ANALYSIS**
+**BAMBASWAP KPI ANALYSIS**
 
-Period:  January - September 2024
+Period:  October 2024
 
 # **Introduction**
 
-SwapFintech is a Kenyan fintech startup that provides a platform for users to instantly convert their airtime to cash and purchase discounted airtime and data bundles. Founded with the mission of providing emergency cash to ordinary Kenyans, SwapFintech has quickly become a popular service in the country. One of SwapFintech’s key   features is its airtime-to-cash conversion service. Users can convert their Safaricom airtime to M-PESA cash  instantly, with a conversion fee of 30% and the user receiving 70% of the airtime value. The conversion process  takes less than a minute, making it a convenient option for those in need of quick cash.
+This report provides an in-depth analysis of Bambaswap's key performance indicators (KPIs) from January to October 2024, focusing on Customer Acquisition Rate (CAR), Monthly Recurring Revenue (MRR), Retention Rate, and Customer Lifetime Value (CLV).
 
-The report analyzes SwapFintech's customer acquisition, retention, and revenue metrics over a nine-month period, providing insight into the company's growth trajectory and customer engagement patterns. Key performance indicators (KPIs) such as Customer Acquisition Rate (C.A.R), Customer Conversion Rate (C.C.R), Monthly Recurring Revenue (M.R.R), Retention Rate (R.R), Churn Rate, and Customer Lifetime Value (CLV) were measured to assess the effectiveness of SwapFintech’s strategies in attracting, converting, and retaining customers. Early data highlights a period of strong growth in acquisition and conversion, followed by significant fluctuations in customer retention and revenue. These metrics reveal critical challenges and opportunities in sustaining customer engagement and maximizing revenue, offering actionable insights into optimizing SwapFintech's long-term growth and profitability. This report aims to provide a comprehensive overview of these trends and their implications for future strategic initiatives.
+By examining these KPIs, we aim to understand customer growth trends, revenue sustainability, retention challenges, and overall business health. A particular focus is placed on October 2024, where significant shifts in these metrics highlight critical business challenges.
 
- This analysis is done using the PostgreSql and you can find all the queries here: [Bambaswap Analysis 2024](/https://github.com/Josh-Muli/bambaswap_analytisc_2024/blob/df1a03cdf693e421f8e2e3caf670d7c8e0b01b71/bs_sql_code_2024/)
+This analysis is done using the PostgreSql and you can find all the queries here: [Bambaswap October Analysis 2024](/https://github.com/Josh-Muli/bambaswap_analytisc_2024/blob/df1a03cdf693e421f8e2e3caf670d7c8e0b01b71/bs_sql_code_2024/)
 
 # **Tools Used**
 
@@ -37,426 +37,468 @@ Each query for this project aimed at investigating specific aspect of the SwapFi
 
 ### **1.	Customer Acquisition Rate (C.A.R)**
 
-**Customer Acquisition Rate (CAR)** measures the rate at which a business gains new customers over a
-specific time period. In SwapFintech case, for the we are interested in calculating the **C.A.R** for
-each month (from February to September) by comparing the number of new customers acquired in a given
-month to the total number of customers from the previous month.
-The formula utilized is :-
+**Customer Acquisition Rate (CAR)** The **Customer Acquisition Rate** measure how many new customers a BambaSwap has gained over a period relative to its existing customer base. In our case, we calculate **CAR** month by month from January to September as historical data and focusing on
+October in this report.
+
+To calculate the **CAR** we utilized the formula:-
+
+$
+\mathit{CAR_{m}} = \frac{\mathit{Returning\ Customers\ Before\ Month\ m}}{\mathit{New\ Customers\ in\ Month\ m}} \times 100
+$
+
+Where;-
+
+• **New Customers in Month m** : Customer who appeared in month m **(October)** but was not a returning customer.
+
+Identified by checking if the phone_number exists in October but (do not exist) in earlier data. (Jan to Sep 2024)
+
+• **Returning Customers** : BambaSwap customers whohave made transactions atleast 3 times before October (January to September).
+
+This ensures that we only consider customers who have shown consistent engagement.
+
+sql query used :-
+
+```sql
+WITH customer_counts AS (
+    -- Count occurrences of each customer per month
+    SELECT phone_number, month, month_number, COUNT(*) AS occurrences
+    FROM bambaswap_combined_jan_oct_2024
+    GROUP BY phone_number, month, month_number
+),
+cumulative_customers AS (
+    -- Track when a customer first appeared and their total count before each month
+    SELECT c1.phone_number, c1.month, c1.month_number,
+        (SELECT COUNT(*)
+         FROM customer_counts c2
+         WHERE c2.phone_number = c1.phone_number
+         AND c2.month_number < c1.month_number) AS prior_count
+    FROM customer_counts c1
+),
+returning_customers AS (
+    -- Identify customers who had 3+ occurrences before a given month
+    SELECT phone_number, month, month_number
+    FROM cumulative_customers
+    WHERE prior_count >= 3
+),
+monthly_customers AS (
+    -- Get unique customers per month
+    SELECT DISTINCT phone_number, month, month_number
+    FROM bambaswap_combined_jan_oct_2024
+),
+new_customers AS (
+    -- Find new customers (not in returning customers for that month)
+    SELECT m.phone_number, m.month, m.month_number
+    FROM monthly_customers m
+    LEFT JOIN returning_customers r 
+    ON m.phone_number = r.phone_number AND m.month = r.month
+    WHERE r.phone_number IS NULL
+)
+-- Calculate CAR per month and replace NULL values
+SELECT 
+    m.month, 
+    m.month_number,
+    -- Ensure no NULL values by using COALESCE and GREATEST
+    COALESCE((COUNT(n.phone_number) * 100.0 / GREATEST(COUNT(r.phone_number), 1)), 0) AS acquisition_rate
+FROM monthly_customers m
+LEFT JOIN new_customers n ON m.phone_number = n.phone_number AND m.month = n.month
+LEFT JOIN returning_customers r ON m.phone_number = r.phone_number AND m.month = r.month
+GROUP BY m.month, m.month_number
+ORDER BY m.month_number;
+```
+
+![Average Acquisition Rate](Oct_2024\car_jan_oct_2024_image.png)
+
+*A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for SwapFintech in the month of October.*
+
+From the analysis and graph respesentation, the following conclusions can be drawn.
+
+1️⃣ **Drastic Drop Compared to Early Months**
+
+• In **January and February**, CAR was extremely high *(521,000% and 369,800%)*, likely due to a surge in new customers.
+    
+• By **October**, CAR fell to *591.2%*, indicating a much lower rate of new customer acquisition compared to the earlier months.
+
+2️⃣ **Steady CAR in Mid-Year, but October Is Higher than September**
+
+• From **June to August**, CAR was around *10,700–10,900%*, showing stable acquisition rates.
+
+• In **September**, CAR dropped to just *9.8%*, but in **October**, it rebounded slightly to *591.2%*, suggesting a small increase in new customer sign-ups.
+
+3️⃣ **October's CAR Reflects a More Mature Market**
+
+• The early months **(Jan–Mar)** had explosive growth, likely from aggressive marketing or a new product launch.
+
+• The lower CAR in **October** signals that the market may be stabilizing, with fewer brand-new customers entering the system.
+
+
+### **2.	Customer Conversion Rate (C.C.R)**
+
+**Customer Conversion Rate** measures how many BambaSwap existing customers (who have used the service before) return in a given month. It helps BambaSwap understand customer retention—how well Bambaswap keeps their customers engaged over time.
+
+How is **CCR** Different from **CAR**?
+        •	**Customer Acquisition Rate (CAR)** measures how many new customers are added in a month.
+        •	**Customer Conversion Rate (CCR)** measures how many of those who were customers in previous months come back in the current month.
+
+The formula emoployed to calculate the CCR is :-
 
 $$
-\mathit{CAR_{Month}} = \frac{\mathit{New\ Customers\ in\ Current\ Month}}{\mathit{Total\ Customers\ in\ Previous\ Month}} \times 100
+\mathit{CCR_{m}} = \frac {\mathit{Returning\ Customers\ in\ Month\ m}}{\mathit{Total\ Customers\ who\ Appeared\ in\ Previous\ Months}} \times 100
 $$
 
-Key terms :-
+Where:
 
-1. **Calculates the number of new customers** acquired each month by comparing them to the previous month.
-2. Calculates the **CAR** for each month by comparing the number of new customers to the total customers in the previous month.
-3. Outputs **CAR** as a percentage, helping to track how successful **SwapFintech** is at acquiring new customers over time.
+• **Returning Customers:** Filters out customers who reappear after being seen in any previous months.
+
+• **Total Customers who Appeared in Month m:** we count how many times a customer appeared in months before m. If past_occurrences > 0, it means the customer was seen in a previous month.
+
+What Insights Does This CCR Provide?
+•	*A High CCR (Near 100%)* → Great retention! Most Bambaswap customers who have used the service before are coming back.
+•	*A Low CCR (Close to 0%)* → Poor retention! Bambaswap Customers are not returning after their first experience.
+•	*Fluctuating CCR Trends* → Could indicate Bambaswap seasonal customer behavior or an issue with customer satisfaction.
 
 sql query used :-
 
 ```sql
 WITH monthly_customers AS (
-    -- Step 1: Get distinct customers for each month using the date_only column
-    SELECT DISTINCT phone_number, 
-           EXTRACT(MONTH FROM date_only) AS month_number,
-           TO_CHAR(date_only, 'Month') AS transaction_month  -- Get the month name from date_only
-    FROM bambaswap_combined_jan_sep_2024
+    -- Get distinct customers per month
+    SELECT DISTINCT phone_number, month, month_number
+    FROM bambaswap_combined_jan_oct_2024
 ),
-new_customers_per_month AS (
-    -- Step 2: Find new customers in each month who did not appear in the previous month
-    SELECT mc.phone_number, 
-           mc.month_number,
-           mc.transaction_month,
-           LAG(mc.transaction_month) OVER (PARTITION BY mc.phone_number ORDER BY mc.month_number) AS previous_month
-    FROM monthly_customers mc
+previous_customers AS (
+    -- Identify all customers who appeared before the current month
+    SELECT mc1.phone_number, mc1.month, mc1.month_number,
+           COUNT(mc2.phone_number) AS past_occurrences
+    FROM monthly_customers mc1
+    LEFT JOIN monthly_customers mc2
+    ON mc1.phone_number = mc2.phone_number 
+    AND mc2.month_number < mc1.month_number
+    GROUP BY mc1.phone_number, mc1.month, mc1.month_number
 ),
-new_customers_by_month AS (
-    -- Step 3: Count new customers for each month
-    SELECT transaction_month, 
-           month_number,
-           COUNT(phone_number) AS new_customers
-    FROM new_customers_per_month
-    WHERE (previous_month IS NULL OR transaction_month != previous_month)  -- New customers who didn’t appear in the previous month
-    GROUP BY transaction_month, month_number
-),
-total_customers_by_month AS (
-    -- Step 4: Calculate total customers in each month
-    SELECT transaction_month, 
-           month_number,
-           COUNT(DISTINCT phone_number) AS total_customers
-    FROM monthly_customers
-    GROUP BY transaction_month, month_number
-),
-previous_month_customers AS (
-    -- Step 5: Calculate total customers for the previous month using LAG function
-    SELECT 
-        transaction_month,
-        month_number,
-        LAG(total_customers) OVER (ORDER BY month_number) AS previous_month_customers
-    FROM total_customers_by_month
+returning_customers AS (
+    -- Customers who have appeared in at least one previous month
+    SELECT phone_number, month, month_number
+    FROM previous_customers
+    WHERE past_occurrences > 0
 )
--- Step 6: Calculate CAR by comparing new customers with the previous month's total customers
+-- Calculate CCR
 SELECT 
-    n.transaction_month,
-    n.month_number,
-    n.new_customers,
-    p.previous_month_customers,
-    ROUND ((n.new_customers::NUMERIC / p.previous_month_customers) * 100,2) AS acquisition_rate
-FROM new_customers_by_month n
-JOIN previous_month_customers p ON n.transaction_month = p.transaction_month AND n.month_number = p.month_number
-WHERE p.previous_month_customers IS NOT NULL  -- Ensure we're excluding January
-ORDER BY n.month_number;
+    mc.month, 
+    mc.month_number,
+    -- Compute CCR: returning customers / total customers from previous months
+    COALESCE((COUNT(rc.phone_number) * 100.0 / GREATEST(COUNT(pc.phone_number), 1)), 0) AS conversion_rate
+FROM monthly_customers mc
+LEFT JOIN returning_customers rc 
+ON mc.phone_number = rc.phone_number AND mc.month = rc.month
+LEFT JOIN previous_customers pc 
+ON mc.phone_number = pc.phone_number AND mc.month_number = pc.month_number
+GROUP BY mc.month, mc.month_number
+ORDER BY mc.month_number;
+
 ```
 
-![Average Acquisition Rate](KPIs_jan_sep_2024\Assets_images\CAR_jan_sep_2024.png)
-*A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for SwapFintech*
-
-From the analysis and graph respesentation, the following conclusions can be drawn.
-
-1. **Steady Growth in the first few Months, Followed by a Sharp Decline:** SwapFintech customer acquisition rate shows steady and strong growth from **February** *(70.98%)* to **April** *(108.97%).* However, in **May**, there is a notable decline, and by **June**, the acquisition rate drops drastically to *2.27%*. This suggests a significant slowdown in acquiring new customers after initial success.
-2. **Drastic Drop in New Customers After May:** After **May**, the number of new customers falls dramatically, with **June** bringing in only *107* new customers compared to the thousands in previous months. This sharp decline may indicate a saturation point or external factors affecting customer acquisition.
-3. **Low and Erratic Growth in Later Months:** After **June**, the customer acquisition rate shows small and somewhat erratic changes, ranging between *99%* and *103%*. The **new customer** count remains consistently low, fluctuating between *107* and *112*. This indicates SwapFintech struggled to regain momentum after the significant drop in **June**, suggesting difficulty in sustaining high acquisition rates long-term.
-
-### **2.	Customer Conversion Rate (C.C.R)**
-
-**SwapFintech Customer Conversion Rate** is defined as the percentage of potential customers (such as visitors to Bambaswap website, users of Bambaswap app, or recipients of a marketing campaign) who completed a transaction i.e successfully converted airtime into cash or successfully bought airtime from SwapFintech platforms during a specific period.
-The CCR formula is :-
-
-$$
-\mathit{CCR_{Month}} = \frac {\mathit{Number\ of\ Conversions}}{\mathit{Number\ of\ Visitors}} \times 100
-$$
-
-Where:
-
-**Number of Conversions:** The number of SwapFintech customers who completed the desired action (e.g., successfully converted  airtime to cash or bought Airtime).
-
-**Total Number of Leads or Visitors:** The total number of potential customers who interacted with the SwapFintech platforms but may not have completed the action (e.g., did not complete the process of buying or converting airtime).
-
-sql query used :-
-
-```sql
-WITH transacted_customers AS (
-    SELECT
-        month,
-        month_number,
-        COUNT(DISTINCT phone_number) AS transacted_count
-    FROM
-        bambaswap_combined_jan_sep_2024
-    WHERE
-        state = 'complete'
-    GROUP BY
-        month, month_number
-),
-total_leads AS (
-    SELECT
-        month,
-        month_number,
-        COUNT(DISTINCT phone_number) AS total_leads_count
-    FROM
-        bambaswap_combined_jan_sep_2024
-    GROUP BY
-        month, month_number
-)
-SELECT
-    t.month,
-    t.month_number,
-    t.transacted_count,
-    l.total_leads_count,
-    ROUND(
-        (t.transacted_count::decimal / l.total_leads_count) * 100, 2
-    ) AS conversion_rate_percentage
-FROM
-    transacted_customers t
-JOIN
-    total_leads l ON t.month = l.month AND t.month_number = l.month_number
-ORDER BY
-    t.month_number;
-```
-
-![Customer Conversion Rate](KPIs_jan_sep_2024\Assets_images\CCR_jan_sep_2024.png)
+![Customer Conversion Rate](Oct_2024\ccr_jan_oct_2024_image.png)
 
 *A powerBI generated waterfall graph showing the monthly SwapFintech average conversion rates*
 
 From the above customer conversion anaysis, the following conclusions were made :-
 
-1. **Consistent Conversion Rate in the First Five Months:** From **January** to **May**, the customer conversion rate remains relatively stable, fluctuating between *66.21%* and *68.58%*. This indicates that the company's ability to convert leads into transacting customers was consistent during this period, with only minor variations.
-2. **Sharp Decline in Conversion Rate After May:** Starting in **June**, there is a notable drop in the conversion rate, falling to *64.49%* and continuing to decline each month, reaching *60.71%* by **September**. This indicates a downward trend in conversion efficiency, suggesting that either the quality of leads decreased, or external factors affected the conversion process in the later months.
-3. **Significant Decrease in Both Leads and Transactions After May:** In addition to the drop in the conversion rate, the total number of leads and transactions drops significantly from **June** onwards. While earlier months see thousands of leads and transactions, from **June** to **September**, the numbers plummet to double digits, with very few leads (around 100 each month) and correspondingly low transaction counts. This dramatic decrease in volume highlights a major reduction in overall SwapFintech business activity, which may have contributed to the decline in conversion rates.
+1️⃣ **Significant Drop from September**
+
+• **September** had a *99.1%* **CCR**, while October dropped to *28.5%*.
+
+• This indicates a sharp decline in conversions, possibly due to seasonal trends, a change in marketing strategy, or lower customer retention.
+
+2️⃣ **Higher Than the Start of the Year**
+
+• **October's** *28.5%* **CCR** is lower than the peak months **(July–September)** but still higher than **February** *(12.5%)* and **March** *(34%)*.
+    
+• This suggests some level of customer engagement is being maintained despite the decline.
+
+3️⃣ **Potential Disruptions or Market Changes**
+
+• The huge gap between **August** *(98.1%)* and **October** *(28.5%)* suggests external factors—maybe a policy change, customer behavior shift, or reduced promotions.
+
+• Investigating customer acquisition strategies and market trends could help understand the cause.
+
 
 ### **3.	Monthly Recurring Revenue (M.R.R)**
 
-**Monthly Recurring Revenue (MRR)** represents the total amount of revenue a SwapFintech expects to earn from its active members/ loyal customers on a monthly basis. It excludes any one-time fees or non-recurring charges. **MRR** provides a clear view of a SwapFintech's revenue health and helps track growth trends over time.
-**MRR** is typically calculated by multiplying the **average revenue per customer (ARPU)** by the total number of recurring customers in a given month.
+**Monthly Recurring Revenue (MRR)** is a key financial metric that measures the predictable and recurring revenue BambaSwap earns each month from returning customers.
 
-Here's a formula to calculate MRR:
+•	It excludes one-time payments and focuses only on customers who continue to pay over time.
+
+•	For our dataset, **MRR** tracks revenue from customers who have paid before (in any previous period) and are paying again
+
+How *MRR* is Different from *Total Revenue*?
+    
+• **Total Revenue** - tracks All payments made in a given month, including first-time customers.
+• **MRR** - Only revenue from returning customers (customers who have paid before).
+
+*Why This Matters:*
+
+**MRR** is crucial for understanding customer retention and revenue stability. If **MRR** is growing, it means the BambaSwap business is retaining and monetizing existing customers well.
+
+The formula that was employed to calculate the *MMR*:
 
 $$
-\mathit {MMR} = \mathit{ARPU\ } X  {\mathit{Number\ of\ Recurring\ Customers}}
+\mathit {MMR} = {Sum\ of\ { Revenue\ from\ Recurring\ Customers\ in\ Month\ m}}
 $$
 
 Where:
 
-**ARPU**: Average Revenue Per User in that month.
+• *Recurring Customers*: Customers who have paid in any previous month and return in month m.
 
-**Number of Recurring Customers:**
-Total number of customers who are generating revenue on a recurring basis each month.
+• *Revenue*:The sum of Bambaswap revenue from all returning customers in month m.
 
-sql query used :-
+*What Insights Can We Get From This MRR Calculation?*
 
-```sql
-WITH arpu AS (
-    -- Calculate total revenue for each month
-    SELECT
-        month,
-        month_number,
-        SUM(bs_revenue) AS total_revenue
-    FROM
-        bambaswap_combined_jan_sep_2024
-    GROUP BY
-        month, month_number
-), 
-filtered_numbers AS (
-    -- Count the number of loyal customers (phone numbers that appear 3 or more times in a month)
-    SELECT 
-        month,
-        month_number,
-        COUNT(DISTINCT phone_number) AS loyal_customers
-    FROM (
-        SELECT 
-            phone_number,
-            month,
-            month_number
-        FROM bambaswap_combined_jan_sep_2024
-        GROUP BY 
-            phone_number, month, month_number
-        HAVING COUNT(*) > 1 -- Loyal customers appear 3 or more times in the month
-    ) AS loyal_customers_per_month
-    GROUP BY 
-        month, month_number
+• If **MRR** is growing → More customers are returning and paying again → Good retention & revenue stability.
+
+• If **MRR** is declining → Fewer customers are returning → Possible churn issue.
+    
+• If **MRR** fluctuates → Indicates seasonality or inconsistent customer retention trends.
+    
+• If **MRR** is *0* in a month with transactions → That month only had new customers (not returning ones).
+
+The sql query used :-
+
+``` sql
+WITH monthly_revenue AS (
+    -- Get total revenue per customer per month
+    SELECT phone_number, month, month_number, SUM(bs_revenue) AS total_revenue
+    FROM bambaswap_combined_jan_oct_2024
+    GROUP BY phone_number, month, month_number
+),
+previous_customers AS (
+    -- Identify customers who have paid in any month before or after the current month
+    SELECT DISTINCT mr1.phone_number, mr1.month, mr1.month_number
+    FROM monthly_revenue mr1
+    LEFT JOIN monthly_revenue mr2
+    ON mr1.phone_number = mr2.phone_number 
+    AND mr2.month_number < mr1.month_number  -- Customer has past payments
+    WHERE mr2.phone_number IS NOT NULL
+),
+recurring_customers AS (
+    -- Customers who made payments in previous months OR will make payments later
+    SELECT DISTINCT phone_number, month, month_number
+    FROM previous_customers
+    UNION
+    SELECT DISTINCT mr1.phone_number, mr1.month, mr1.month_number
+    FROM monthly_revenue mr1
+    JOIN monthly_revenue mr2
+    ON mr1.phone_number = mr2.phone_number 
+    AND mr1.month_number > mr2.month_number  -- Customer pays again later
 )
--- Calculate ARPU (Total Revenue / Number of Loyal Customers) per month
-, arpu_calculation AS (
-    SELECT 
-        arpu.month,
-        arpu.month_number,
-        -- Use COALESCE to handle NULL values for loyal_customers
-        ROUND(CASE 
-            WHEN COALESCE(filtered_numbers.loyal_customers, 0) = 0 THEN 0 
-            ELSE arpu.total_revenue / COALESCE(filtered_numbers.loyal_customers, 0)
-        END, 2) AS arpu
-    FROM
-        arpu
-    LEFT JOIN 
-        filtered_numbers ON arpu.month = filtered_numbers.month
-)
--- Final MRR calculation for each month
+-- Calculate MRR per month
 SELECT 
-    arpu_calculation.month,                -- Month in date format (e.g., 2023-01-01)
-    arpu_calculation.month_number,         -- Month number (e.g., 1 for January)
-    arpu_calculation.arpu,                 -- ARPU value
-    -- Calculate MRR as ARPU * loyal customers, using COALESCE to handle missing values
-    ROUND(CASE 
-        WHEN COALESCE(filtered_numbers.loyal_customers, 0) = 0 THEN 0 
-        ELSE arpu_calculation.arpu * COALESCE(filtered_numbers.loyal_customers, 0)
-    END, 2) AS mrr -- MRR calculation
-FROM
-    arpu_calculation
-LEFT JOIN 
-    filtered_numbers ON arpu_calculation.month = filtered_numbers.month
-ORDER BY 
-    arpu_calculation.month_number;
+    mr.month, 
+    mr.month_number,
+    COALESCE(SUM(mr.total_revenue), 0) AS monthly_recurring_revenue
+FROM monthly_revenue mr
+INNER JOIN recurring_customers rc 
+ON mr.phone_number = rc.phone_number AND mr.month = rc.month
+GROUP BY mr.month, mr.month_number
+ORDER BY mr.month_number;
+
 ```
 
-![Monthly Recurring Rate](KPIs_jan_sep_2024\Assets_images\Recurring_Rate_jan_sep_2024.png)
+![Monthly Recurring Rate](Oct_2024\mRecurring_r_jan_oct_2024_image.png)
 
 *A powerBI generated graph showing the monthly changes in ARPU and Monthly Recurring Rate for SwapFintech*
 
 Here are three main summary insights from the Monthly Recurring Revenue (MRR) data for Bambaswap from January to September 2024:
 
-1. **MRR Decline in the First Quarter:** There was a noticeable decline in MRR from **January** *($1,163,542.32)* to **March** *($1,031,313.14)*. This could indicate a potential issue in customer retention or reduced business performance in the early part of the year.
-2. **Missing MMR in April:** The absence of data for both **ARPU (Average Revenue per User)** and **MRR** in April stands out. This gap may indicate data collection issues or irregularities in revenue tracking for that month, which could affect trend analysis for the entire period. Or **No New Customer Acquisition:** that is if SwapFintech did not acquiring any new customers and all existing customers had either churned or did only one transaction in the period, hence the MRR dropped to zero.
-3. **Recovery and Stabilization in Later Months**: After the dip in **March**, MRR increases again in May (*$834,098.52*) and stabilizes around a similar range from **June** to **September,** fluctuating between approximately *$760,338* and *$856,160*. This suggests that after the initial drop, the revenue stabilizes, albeit at a lower level compared to the first quarter.
+1️⃣ **October Had the Lowest MRR of the Year**
 
-### **4.	Monthly Retention Rate (R.R)**
+• **October’s** *MRR* dropped to *ksh. 723,034*, the lowest recorded value in the dataset.
+    
+• This suggests a decline in recurring revenue, possibly due to customer churn, lower renewals, or reduced engagement.
 
-**The Retention Rate (R.R)** is a metric used to measure the percentage of customers who remain active or continue using a service over a specific period of time. It is the opposite of the churn rate and is a critical indicator of customer loyalty and the effectiveness of a business in retaining its existing customers. In SwapFintech, loyal customers was measured by the number of customers who made more than three 3 transactions in a month.
+2️⃣ **Steady Decline Since Mid-Year**
 
-* **Identify Qualified Customers** : Customers who have made more than 3 transactions in a given month.
-* **Identify Retained Customers** : Customers who made more than 2 transactions in  **consecutive months** .
-* **Calculate Retention Rate** : For each month, calculate the Retention Rate as the percentage of **retained customers** (those with consecutive month activity) over the **total qualified customers** for that month.
+• After peaking in **March** *(ksh. 876,220)*, MRR showed a downward trend, with fluctuations but an overall decline.
 
-To calculate the **Retention Rate (R.R)**, you can use the following formula:
+• From *September to October*, MRR fell further (ksh 765,124 → ksh 723,034), signaling a continued drop in retention.
+
+3️⃣ **MRR Is Lower Despite a Slight CAR Increase**
+
+• In **October**, CAR (Customer Acquisition Rate) slightly rebounded from **September’s** low *(9.8% to 591.2%)*, meaning new customers were acquired.
+    
+• However, **MRR** still declined, indicating that revenue loss from churned customers may have outweighed new revenue.
+
+
+
+### **4.	Monthly Retention Rate (M.R.R)**
+
+**The Retention Rate (R.R)** is a key customer success metric that measures the percentage of BambaSwap existing customers who continue paying month after month.
+
+•	It tells us how well the bambaswap retains customers over time.
+
+•	A high retention rate indicates strong customer loyalty, while a low rate suggests customer churn (customers are leaving).
+
+
+To calculate the **Retention Rate (R.R)**, we used the following formula:
 
 $$
-\mathit {Retention Rate}_{(RR)} = \frac {{\mathit (RetainedCustomers)}}{\mathit {TotalCustomersInCurrentMonth}} \mathit {\times 100}
+\mathit {Retention Rate}_{(m)} = (\frac {{\mathit Returning\ Customers\ Month\ m}}{\mathit {Total\ Customers\ in\ Month\ m-1}}) \mathit {\times 100}
 $$
 
-Query used was
+Where:
+
+•	*Returning Customers in Month m* → Bambaswap Customers who paid in m-1 and continue paying in m.
+    
+•	*Total Customers in Month m-1* → All unique customers who paid in the previous month.
+
+*What Insights Can We Get From This Query?*
+
+• If Retention Rate is high → Customers continue using the service, indicating strong loyalty.
+
+• If Retention Rate is dropping → Churn rate is increasing, meaning customers are leaving.
+
+• If Retention Rate is 0% for a month → No customers from m-1 returned in m.
+
+• Seasonal Retention Trends → If retention fluctuates, it could be due to seasonal demand or product changes.
+
+Query used was to calculate the **MRR** is:-
 
 ```sql
-WITH customer_transactions AS (
-    -- Count the number of transactions per phone_number per month
-    SELECT 
-        phone_number, 
-        month, 
-        month_number,
-        COUNT(*) AS transaction_count
-    FROM 
-        bambaswap_combined_jan_sep_2024
-    GROUP BY 
-        phone_number, month, month_number
+WITH monthly_customers AS (
+    -- Get distinct paying customers per month
+    SELECT DISTINCT phone_number, month, month_number
+    FROM bambaswap_combined_jan_oct_2024
+    
 ),
-qualified_customers AS (
-    -- Filter for customers with more than 1 transactions per month
-    SELECT 
-        phone_number, 
-        month, 
-        month_number
-    FROM 
-        customer_transactions
-    WHERE 
-        transaction_count > 1
+previous_month_customers AS (
+    -- Count total customers in the previous month
+    SELECT mc1.month AS previous_month, mc1.month_number AS previous_month_number, COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
+    FROM monthly_customers mc1
+    GROUP BY mc1.month, mc1.month_number
 ),
-retained_customers AS (
-    -- Join the customers with consecutive months to find retained customers
-    SELECT 
-        q1.phone_number, 
-        q1.month AS current_month, 
-        q2.month AS next_month
-    FROM 
-        qualified_customers q1
-    INNER JOIN 
-        qualified_customers q2
-    ON 
-        q1.phone_number = q2.phone_number
-        AND q1.month_number = q2.month_number - 1  -- Check for consecutive months
+returning_customers AS (
+    -- Count returning customers (who paid in `m-1` and are still paying in `m`)
+    SELECT mc2.month AS current_month, mc2.month_number AS current_month_number, COUNT(DISTINCT mc2.phone_number) AS returning_customers
+    FROM monthly_customers mc2
+    LEFT JOIN monthly_customers mc1  -- Use LEFT JOIN instead of INNER JOIN
+    ON mc2.phone_number = mc1.phone_number
+    AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
+    GROUP BY mc2.month, mc2.month_number
 )
--- Final calculation of the retention rate
+-- Calculate Monthly Retention Rate
 SELECT 
-    q1.month AS current_month, 
-    COUNT(DISTINCT q2.phone_number) AS retained_customers, 
-    COUNT(DISTINCT q1.phone_number) AS total_customers,
-    ROUND ((COUNT(DISTINCT q2.phone_number) * 100.0) / COUNT(DISTINCT q1.phone_number),2) AS retention_rate
-FROM 
-    qualified_customers q1
-LEFT JOIN 
-    retained_customers q2
-ON 
-    q1.phone_number = q2.phone_number
-    AND q1.month = q2.current_month
-GROUP BY 
-    q1.month, q1.month_number
-ORDER BY 
-    q1.month_number;
+    pm.previous_month,
+    pm.previous_month_number,
+    COALESCE(rc.current_month, 'No Returning Customers') AS current_month,
+    COALESCE(rc.current_month_number, pm.previous_month_number + 1) AS current_month_number,
+    COALESCE((rc.returning_customers * 100.0 / GREATEST(pm.total_previous_customers, 1)), 0) AS retention_rate
+FROM previous_month_customers pm
+LEFT JOIN returning_customers rc 
+ON pm.previous_month_number + 1 = rc.current_month_number
+ORDER BY pm.previous_month_number;
+
 ```
 
-![Monthly Retention Rate](KPIs_jan_sep_2024\Assets_images\Retention_Rate_jan_sep_2024.png)
+![Monthly Retention Rate](Oct_2024\mRetention_r_jan_oct_2024_image.png)
 
 *A powerBI generated graph showing the monthly changes in Monthly Retention Rate*
 
-Here are the main insights drawn from the analyzed SwapFintech Retention Rate.
+Here are the main insights drawn from the analyzed BambaSwap Retention Rate.
 
-1. **Retention Spike in March and April:** In **March** and **April,** retention rates were significantly higher compared to **January** and **February**, reaching *36.01%* and *32.62%* respectively. This may suggest that a successful strategy (e.g., a new promotion, product launch, or improved customer experience) was implemented around this period, which led to increased retention.
-   The increase could indicate a period of strong customer loyalty, or that customers found value during this time and returned for additional transactions.
-2. **Drastic Drop in Retention in May and September:** **May** and **September** show *0%* retention rates, indicating that no customers were retained into the following month. This is a critical insight, as it suggests a major issue in sustaining customer interest or satisfaction during these periods.
-   This may indicate seasonal fluctuations, operational disruptions, or customer disengagement. Identifying the cause and addressing it would be essential to prevent similar drops in the future.
-3. **Consistent High Retention in Summer Months (June to August):** The retention rates from **June** to **August** were exceptionally high, with over *89%* each month. This suggests that customers who made transactions in **June** were highly likely to return in the following months.
-   High retention rates in the summer months indicate strong customer loyalty during this period, possibly driven by seasonal demand, effective retention strategies, or specific product/service appeal during these months.
+1️⃣ **Retention Declined in October Alongside MRR Drop**
+
+• **October’s** retention rate likely dropped, as **MRR** fell to *ksh.723,034*, the lowest recorded value in the dataset.
+    
+• This suggests higher churn or fewer renewals, impacting long-term revenue stability.
+
+2️⃣ **Sustained Decline Since March’s Peak**
+
+• **March** had the highest **MRR** *(ksh. 876,220)*, indicating strong customer retention at that time.
+    
+• Since then, **MRR** has steadily decreased, suggesting that retention has weakened over time, leading to revenue shrinkage.
+
+3️⃣ **New Customers in October Didn’t Fully Offset Churn**
+
+• Despite a small rebound in Customer Acquisition Rate (CAR) in **October**, overall **MRR** and retention still declined.
+    
+• This means more customers likely churned than were retained, signaling a retention strategy issue.
 
 ### **5.	Monthly Churn Rate (R.R)**
 
-**Churn Rate** is the customers who stopped using a products and/ or services during a given period. This measures the customer attrition.
-The churn rate for **SwapFintech** measures the percentage of customers who were active in one month but did not make any transactions in the following month. In other words, it is the rate at which customers stop using SwapFintech's services from one month to the next. Churn rate helps identify how many customers leave or "churn" out of the total customer base month by month, which is essential for understanding customer retention and engagement levels over time.
+**Churn Rate** measures the percentage of Bambaswap customers who stop paying from one month to the next. It is the opposite of Retention Rate.
 
-The SwapFintech churn rate formula in this query is:
+•	If Retention Rate is high, Churn Rate is low → Business is retaining customers well.
 
-Churn Rate Formula
+•	If Churn Rate is high, it means many customers are leaving the service.
+
+
 
 To calculate the **Churn Rate**, use the following formula:
 
 $$
-\mathit{Churn Rate} = \frac{\mathit{Total Customers in Current Month} - \mathit{Retained Customers (Customers in Next Month)}}{\mathit{Total Customers in Current Month}} \times 100
+\mathit{Churn\ Rate}_{(m)} = \frac{\mathit{Customers\ who\ Left\ in\ Month\ m}}{\mathit{Total\ Customers\ in\ Month\ m-1}} \times 100
 $$
 
-Here is the sql query used for the churn rate
+Where:
 
-```sql
-WITH customer_transactions AS (
-    -- Count the number of transactions per phone_number per month
-    SELECT 
-        phone_number, 
-        month, 
-        month_number,
-        COUNT(*) AS transaction_count
-    FROM 
-        bambaswap_combined_jan_sep_2024
-    GROUP BY 
-        phone_number, month, month_number
+•	*Churned Customers in Month m* → Customers who paid in m-1 but did not pay in m.
+
+•	*Total Customers in Month m-1* → All unique customers who paid in m-1.
+
+*What Insights Can We Get?*
+
+• If Churn Rate is high → Many customers are leaving → Possible retention issues.
+
+• If Churn Rate is low → Customers are staying & continuing to pay.
+
+• If Churn Rate fluctuates → Could indicate seasonal trends or business model changes.
+
+• If Churn Rate is 0% for a month → No customers from m-1 left (great retention).
+
+
+Here is the sql query used for the churn rate;- 
+
+``` sql
+WITH monthly_customers AS (
+    -- Get distinct paying customers per month
+    SELECT DISTINCT phone_number, month, month_number
+    FROM bambaswap_combined_jan_oct_2024
 ),
-qualified_customers AS (
-    -- Filter for customers with more than 3 transactions per month
-    SELECT 
-        phone_number, 
-        month, 
-        month_number
-    FROM 
-        customer_transactions
-    WHERE 
-        transaction_count > 2
+previous_month_customers AS (
+    -- Count total customers in the previous month
+    SELECT mc1.month AS previous_month, 
+           mc1.month_number AS previous_month_number, 
+           COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
+    FROM monthly_customers mc1
+    GROUP BY mc1.month, mc1.month_number
 ),
-retained_customers AS (
-    -- Join the customers with consecutive months to find retained customers
-    SELECT 
-        q1.phone_number, 
-        q1.month_number,
-        q1.month AS current_month, 
-        q2.month AS next_month
-    FROM 
-        qualified_customers q1
-    INNER JOIN 
-        qualified_customers q2
-    ON 
-        q1.phone_number = q2.phone_number
-        AND q1.month_number = q2.month_number - 1  -- Check for consecutive months
-),
-churned_customers AS (
-    -- Find customers who churned (did not return in the next month)
-    SELECT 
-        q1.phone_number, 
-        q1.month_number,
-        q1.month AS current_month
-    FROM 
-        qualified_customers q1
-    LEFT JOIN 
-        retained_customers q2
-    ON 
-        q1.phone_number = q2.phone_number 
-        AND q1.month = q2.current_month
-    WHERE 
-        q2.phone_number IS NULL  -- Only include customers who did not return
+returning_customers AS (
+    -- Count returning customers (who paid in `m-1` and are still paying in `m`)
+    SELECT mc2.month AS current_month, 
+           mc2.month_number AS current_month_number, 
+           COUNT(DISTINCT mc2.phone_number) AS returning_customers
+    FROM monthly_customers mc2
+    JOIN monthly_customers mc1
+    ON mc2.phone_number = mc1.phone_number
+    AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
+    GROUP BY mc2.month, mc2.month_number
 )
--- Final calculation of the churn rate
+-- Calculate Monthly Churn Rate
 SELECT 
-    q1.month AS current_month, 
-    q1.month_number,
-    COUNT(DISTINCT q1.phone_number) AS total_customers,
-    COUNT(DISTINCT c.phone_number) AS churned_customers,
-    ROUND ((COUNT(DISTINCT c.phone_number) * 100.0) / COUNT(DISTINCT q1.phone_number),2) AS churn_rate
-FROM 
-    qualified_customers q1
-LEFT JOIN 
-    churned_customers c
-ON 
-    q1.phone_number = c.phone_number 
-    AND q1.month = c.current_month
-GROUP BY 
-    q1.month,q1.month_number
-ORDER BY 
-    q1.month_number;
+    pm.previous_month,
+    pm.previous_month_number,
+    COALESCE(rc.current_month, 'No Returning Customers') AS current_month,
+    COALESCE(rc.current_month_number, pm.previous_month_number + 1) AS current_month_number,
+    -- Churn Rate = (Total Customers in `m-1` - Returning Customers in `m`) / Total Customers in `m-1`
+    COALESCE(((pm.total_previous_customers - COALESCE(rc.returning_customers, 0)) * 100.0 / 
+              GREATEST(pm.total_previous_customers, 1)), 0) AS churn_rate
+FROM previous_month_customers pm
+LEFT JOIN returning_customers rc 
+ON pm.previous_month_number + 1 = rc.current_month_number
+ORDER BY pm.previous_month_number;
+
 ```
 
-![Churn Rate Graph](KPIs_jan_sep_2024\Assets_images\Churn_Rate_jan_sep_2024.png)
+![Churn Rate Graph](Oct_2024\churn_rate_jan_oct_2024_image.png)
+
 
 *A powerBI generated graph showing the monthly changes in Monthly Churn Rate*
 
@@ -468,107 +510,123 @@ SwapFintech churn Rate insight from the above analysis ;-
 
 ### **6.	Customer Lifetime Value (CLV)**
 
-**Customer Lifetime Value (CLV)** is a key metric in business that represents the total revenue a business can expect to earn from a single customer over the entire time that the customer interacts with the business. It helps businesses understand the long-term value of their customers and assess how much they should spend to acquire and retain customers.
-SwapFintech CLV for each month was calculated by considering the **average revenue per user (ARPU)** and the **churn rate**.
-SwapFintech CLV is calculated on a monthly basis, using the formula:
+**Customer Lifetime Value (CLV)** estimates the total revenue Bambaswap can expect from a single customer over their entire relationship with Bambaswap.
+
+•	Higher CLV means customers stay longer and spend more.
+
+•	Lower CLV suggests short customer relationships or low spending.
+
+
+BambaSwap CLV is calculated on a monthly using the formula:-
 
 $$
-\mathit {CLV} = \frac {\mathit{ARPU}}{\mathit {ChurnRate}}
+\mathit {CLV}_{m} = ARPU_m\ \times (\frac {\mathit{1}}{\mathit {Churn\ Rate_m}}) \times 100
 $$
 
 where:
 
-**ARPU (Average Revenue Per User):** This is calculated as the total revenue for the month divided by the number of unique customers that month.
-**Churn Rate:** The percentage of customers who did not return in the following month.
+• **ARPU (Average Revenue Per User):** This is calculated as the total revenue in month m divided by the total customers in month m.
+                
+• **Churn Rate:** The percentage of customers who did not return in the following month.
 
 The below query was utilized to calculate the CLV
 
-```sql
-CREATE TABLE customer_lifetime_value_jan_sep_2024 AS
-WITH customers_current_month AS (
-    -- Get distinct customers who made at least one transaction in each month
-    SELECT 
-        phone_number,
-        month_number,
-        month
-    FROM 
-        bambaswap_combined_jan_sep_2024
-    GROUP BY 
-        phone_number, month_number, month
+``` sql
+WITH monthly_revenue AS (
+    -- Get total revenue per month
+    SELECT month, month_number, SUM(bs_revenue) AS total_revenue, COUNT(DISTINCT phone_number) AS total_customers
+    FROM bambaswap_combined_jan_oct_2024
+    GROUP BY month, month_number
 ),
-customers_next_month AS (
-    -- Get distinct customers who made at least one transaction in the next month
+churn_data AS (
+    -- Get churn rate per month (from previous churn rate query)
+    WITH monthly_customers AS (
+        -- Get distinct paying customers per month
+        SELECT DISTINCT phone_number, month, month_number
+        FROM bambaswap_combined_jan_oct_2024
+        
+    ),
+    previous_month_customers AS (
+        -- Count total customers in the previous month
+        SELECT mc1.month AS previous_month, 
+               mc1.month_number AS previous_month_number, 
+               COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
+        FROM monthly_customers mc1
+        GROUP BY mc1.month, mc1.month_number
+    ),
+    returning_customers AS (
+        -- Count returning customers (who paid in `m-1` and are still paying in `m`)
+        SELECT mc2.month AS current_month, 
+               mc2.month_number AS current_month_number, 
+               COUNT(DISTINCT mc2.phone_number) AS returning_customers
+        FROM monthly_customers mc2
+        JOIN monthly_customers mc1
+        ON mc2.phone_number = mc1.phone_number
+        AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
+        GROUP BY mc2.month, mc2.month_number
+    )
+    -- Calculate Monthly Churn Rate
     SELECT 
-        phone_number,
-        month_number AS next_month_number
-    FROM 
-        bambaswap_combined_jan_sep_2024
-    GROUP BY 
-        phone_number, month_number
-),
-monthly_revenue AS (
-    -- Calculate total revenue and ARPU for each month
-    SELECT 
-        month_number,
-        month,
-        SUM(bs_revenue) AS total_revenue,
-        COUNT(DISTINCT phone_number) AS total_customers,
-        ROUND (SUM(bs_revenue) / COUNT(DISTINCT phone_number),2) AS arpu -- ARPU calculation
-    FROM 
-        bambaswap_combined_jan_sep_2024
-    GROUP BY 
-        month_number, month
-),
-churn_rate AS (
-    -- Calculate churn rate for each month
-    SELECT 
-        cm.month,                              -- 3-letter month name
-        cm.month_number,                                -- Numeric month
-        COUNT(DISTINCT cm.phone_number) AS total_customers, -- Total customers in the month
-        ROUND (COUNT(DISTINCT cm.phone_number) - COUNT(DISTINCT nm.phone_number),2) AS churned_customers, -- Customers who churned
-        ROUND((COUNT(DISTINCT cm.phone_number) - COUNT(DISTINCT nm.phone_number)) * 100.0 / COUNT(DISTINCT cm.phone_number), 2) AS churn_rate -- Churn rate calculation
-    FROM 
-        customers_current_month cm
-    LEFT JOIN 
-        customers_next_month nm 
-    ON 
-        cm.phone_number = nm.phone_number 
-        AND cm.month_number = nm.next_month_number - 1 -- Join with next month data
-    GROUP BY 
-        cm.month, cm.month_number
+        pm.previous_month,
+        pm.previous_month_number,
+        rc.current_month,
+        rc.current_month_number,
+        -- Churn Rate = (Total Customers in `m-1` - Returning Customers in `m`) / Total Customers in `m-1`
+        COALESCE(((pm.total_previous_customers - COALESCE(rc.returning_customers, 0)) * 1.0 / 
+                  GREATEST(pm.total_previous_customers, 1)), 0) AS churn_rate
+    FROM previous_month_customers pm
+    LEFT JOIN returning_customers rc 
+    ON pm.previous_month_number + 1 = rc.current_month_number
 )
--- Final CLV calculation: CLV = ARPU / Churn Rate
+-- Calculate CLV per month
 SELECT 
-    mr.month, -- 3-letter month name
-    mr.month_number,   -- Numeric month
-    mr.arpu,           -- Average Revenue Per User (ARPU)
-    cr.churn_rate,     -- Churn Rate (%)
+    mr.month, 
+    mr.month_number,
+    (mr.total_revenue * 1.0 / NULLIF(mr.total_customers, 0)) AS ARPU,  -- Avoid division by zero
+    cd.churn_rate,
     CASE 
-        WHEN cr.churn_rate > 0 THEN ROUND(mr.arpu / (cr.churn_rate / 100), 2)  -- CLV calculation
-        ELSE NULL
-    END AS clv         -- CLV calculation (if churn_rate > 0)
-FROM 
-    monthly_revenue mr
-JOIN 
-    churn_rate cr ON mr.month_number = cr.month_number
-ORDER BY 
-    mr.month_number;
+        WHEN cd.churn_rate = 0 THEN NULL  -- Prevent division by zero
+        ELSE (mr.total_revenue / NULLIF(mr.total_customers, 0)) * (1.0 / cd.churn_rate)
+    END AS customer_lifetime_value
+FROM monthly_revenue mr
+LEFT JOIN churn_data cd 
+ON mr.month_number = cd.previous_month_number
+ORDER BY mr.month_number;
 
-SELECT *
-FROM customer_lifetime_value_jan_sep_2024;
 ```
 
-![CLV graph](KPIs_jan_sep_2024\Assets_images\CLV_jan_sep_2024.png)
+![CLV graph](Oct_2024\clv_jan_oct_2024_image.png)
 
 From the above analysis,the following insights were drawn;-
 
-Extremely High ARPU Variability:
+1️⃣ **October Had the Lowest CLV of the Year**
 
-1. **Monthly ARPU values vary significantly**, with a few months reaching very high ARPU (e.g., **June** with *KES8001.50 and **August** with KES *7750.82*), *which drastically boosts the CLV during those months. This variance suggests either substantial differences in customer spending across periods or some months seeing high-spending customers.
-   Impact of Churn Rate on CLV*:*
-2. **A high churn rate**, such as in **May** and **September** (both *100%*), results in a low CLV. Months with low churn rates (e.g., **August** at *0.93%*) yield very high CLVs, indicating that retaining customers significantly improves lifetime value.
-3. **Irregular CLV Distribution:** The CLV distribution is inconsistent, with a few months like **June** and **August** seeing CLVs over *KES**100,000*, while others (such as **May** and **September**) are below *KES**10,000*. This distribution suggests possible cyclical changes in customer behavior or external factors impacting both churn and ARPU.
+• **CLV** in **October** dropped to just *163.74*, the lowest recorded value, signaling poor long-term revenue per customer.
+    
+• This sharp decline suggests high churn and low revenue retention.
+
+2️⃣ **Churn Rate Hit 100% in October**
+
+• A **1.00 (100%)** churn rate means every customer left, leading to near-zero customer lifetime value.
+    
+• Even though **August** had the highest CLV *(ksh. 837,089)*, the drop in retention from **September** to **October** erased customer value.
+
+3️⃣ **Drastic ARPU Decline Contributed to CLV Drop**
+
+• **Average Revenue Per User (ARPU)** in **October** fell to *ksh. 163.73*, a huge drop from **August** *(ksh. 7,750.82)* and **September** *(ksh. 6,831.46)*.
+
+• Low **ARPU + high churn = collapsed CLV**, making **October** a critical month for retention issues.
 
 # **Conclusion**
 
-The analysis reveals a stark transition in **SwapFintech's** customer acquisition and retention dynamics post-May, characterized by a steep decline in new customer growth and retention, alongside erratic monthly revenue patterns. Despite initial high acquisition and stable conversion rates, the sudden downturn in both acquisition and retention suggests potential saturation or market shift. This volatility is mirrored in customer lifetime value (CLV) and churn metrics, where high ARPU months sharply contrast with periods of low CLV and high churn. The data suggests that SwapFintech may benefit from enhancing its retention strategies to mitigate high churn, stabilizing revenue streams, and investigating underlying causes behind seasonal acquisition and retention challenges to improve long-term customer value and business stability.
+For **October**, all key performance indicators (KPIs) point to a major customer retention crisis:
+
+• **Customer Acquisition Rate (CAR)**: *Increased* slightly from September but wasn't enough to offset customer churn.
+
+• **Monthly Recurring Revenue (MRR)**: *Dropped* to *ksh. 723,034*, the *lowest* of the year, signaling revenue loss.
+
+• **Retention Rate**: *Declined* further, with a high churn rate eroding recurring revenue.
+
+• **Customer Lifetime Value (CLV)**: *Crashed* to *ksh. 163.74*, due to 100% churn, meaning no long-term revenue from customers.
+
+👉 **Final Insight**: **October's** customer retention issues significantly impacted revenue and long-term customer value, making it crucial to focus on **reducing churn** and **improving engagement** strategies.
