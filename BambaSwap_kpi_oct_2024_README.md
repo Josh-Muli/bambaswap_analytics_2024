@@ -108,7 +108,7 @@ ORDER BY m.month_number;
 
 ![Average Acquisition Rate](Oct_2024\car_jan_oct_2024_image.png)
 
-*A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for SwapFintech in the month of October.*
+*A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for BambaSwap in the month of October.*
 
 From the analysis and graph respesentation, the following conclusions can be drawn.
 
@@ -202,7 +202,7 @@ ORDER BY mc.month_number;
 
 ![Customer Conversion Rate](Oct_2024\ccr_jan_oct_2024_image.png)
 
-*A powerBI generated waterfall graph showing the monthly SwapFintech average conversion rates*
+*A powerBI generated waterfall graph showing the monthly BambaSwap average conversion rates*
 
 From the above customer conversion anaysis, the following conclusions were made :-
 
@@ -265,7 +265,7 @@ Where:
 
 The sql query used :-
 
-``` sql
+```sql
 WITH monthly_revenue AS (
     -- Get total revenue per customer per month
     SELECT phone_number, month, month_number, SUM(bs_revenue) AS total_revenue
@@ -307,7 +307,7 @@ ORDER BY mr.month_number;
 
 ![Monthly Recurring Rate](Oct_2024\mRecurring_r_jan_oct_2024_image.png)
 
-*A powerBI generated graph showing the monthly changes in ARPU and Monthly Recurring Rate for SwapFintech*
+*A powerBI generated graph showing the monthly changes in ARPU and Monthly Recurring Rate for BambaSwap*
 
 Here are three main summary insights from the Monthly Recurring Revenue (MRR) data for Bambaswap from January to September 2024:
 
@@ -366,7 +366,7 @@ WITH monthly_customers AS (
     -- Get distinct paying customers per month
     SELECT DISTINCT phone_number, month, month_number
     FROM bambaswap_combined_jan_oct_2024
-    
+  
 ),
 previous_month_customers AS (
     -- Count total customers in the previous month
@@ -453,7 +453,7 @@ Where:
 
 Here is the sql query used for the churn rate;-
 
-``` sql
+```sql
 WITH monthly_customers AS (
     -- Get distinct paying customers per month
     SELECT DISTINCT phone_number, month, month_number
@@ -498,7 +498,7 @@ ORDER BY pm.previous_month_number;
 
 *A powerBI generated graph showing the monthly changes in Monthly Churn Rate*
 
-SwapFintech churn Rate insight from the above analysis ;-
+BambaSwap churn Rate insights from the above analysis ;-
 
 1. **High Initial Churn Rates and Sudden Spikes:** The churn rate is extremely high in the first five months, with **May** showing a full *100%* churn rate. This suggests that a significant number of customers are leaving in the early stages, potentially indicating initial dissatisfaction or unmet expectations.
 2. **Drastic Reduction in Churn Post-May:** Starting from **June**, there is a notable drop in churn rates (*3.96%* in **June**, *7%* in **July**, *4%* in **August**), indicating an improvement in customer retention or fewer new customers to churn. This drop may reflect targeted retention efforts, improvements in product satisfaction, or a reduced acquisition pace.
@@ -526,7 +526,7 @@ where:
 
 The below query was utilized to calculate the CLV
 
-``` sql
+```sql
 WITH monthly_revenue AS (
     -- Get total revenue per month
     SELECT month, month_number, SUM(bs_revenue) AS total_revenue, COUNT(DISTINCT phone_number) AS total_customers
@@ -539,7 +539,7 @@ churn_data AS (
         -- Get distinct paying customers per month
         SELECT DISTINCT phone_number, month, month_number
         FROM bambaswap_combined_jan_oct_2024
-        
+      
     ),
     previous_month_customers AS (
         -- Count total customers in the previous month
