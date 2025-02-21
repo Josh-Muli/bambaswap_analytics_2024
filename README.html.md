@@ -392,9 +392,9 @@ code {
 <p><strong>Customer Acquisition Rate (CAR)</strong> The <strong>Customer Acquisition Rate</strong> measure how many new customers a BambaSwap has gained over a period relative to its existing customer base. In our case, we calculate <strong>CAR</strong> month by month from January to September as historical data and focusing on
 October in this report.</p>
 <p>To calculate the <strong>CAR</strong> we utilized the formula:-</p>
-<p>$
+<p>$$
 \mathit{CAR_{m}} = \frac{\mathit{Returning\ Customers\ Before\ Month\ m}}{\mathit{New\ Customers\ in\ Month\ m}} \times 100
-$</p>
+$$</p>
 <p>Where;-</p>
 <p>• <strong>New Customers in Month m</strong> : Customer who appeared in month m <strong>(October)</strong> but was not a returning customer.</p>
 <p>Identified by checking if the phone_number exists in October but (do not exist) in earlier data. (Jan to Sep 2024)</p>

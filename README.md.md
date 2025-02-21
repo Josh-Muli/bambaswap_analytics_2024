@@ -42,9 +42,9 @@ October in this report.
 
 To calculate the **CAR** we utilized the formula:-
 
-$
+$$
 \mathit{CAR_{m}} = \frac{\mathit{Returning\ Customers\ Before\ Month\ m}}{\mathit{New\ Customers\ in\ Month\ m}} \times 100
-$
+$$
 
 Where;-
 
