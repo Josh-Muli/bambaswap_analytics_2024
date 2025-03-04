@@ -106,7 +106,7 @@ GROUP BY m.month, m.month_number
 ORDER BY m.month_number;
 ```
 
-![Average Acquisition Rate](Oct_2024\car_jan_oct_2024_image.png)
+![Average Acquisition Rate](Oct_2024_images\car_jan_oct_2024_image.png)
 
 *A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for BambaSwap in the month of October.*
 
