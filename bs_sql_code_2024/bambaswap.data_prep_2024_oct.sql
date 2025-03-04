@@ -1,6 +1,6 @@
+DROP table bambaswap_combined_nov_dec_2024;
 
-
-CREATE TABLE bambaswap_sep_2024_data
+CREATE TABLE bambaswap_nov_2024_data
 (
     date TIMESTAMP,
     phone_number TEXT,
@@ -13,28 +13,66 @@ CREATE TABLE bambaswap_sep_2024_data
     trans_Type TEXT
 );
 
-ALTER TABLE public.bambaswap_SEP_2024_data OWNER to postgres;
+CREATE TABLE bambaswap_dec_2024_data
+(
+    date TIMESTAMP,
+    phone_number TEXT,
+    amount_recieved INT,
+    amount_sent NUMERIC,
+    results_description TEXT,
+    device_name TEXT,
+    sessionID TEXT,
+    state TEXT,
+    trans_Type TEXT
+);
 
-COPY bambaswap_oct_2024_data
-FROM 'D:\MySQL\BAMBASWAP\bambaswap_analysis_2024\csv_data jan_sep_2024\OCT2024.csv'
+ALTER TABLE public.bambaswap_NOV_2024_data OWNER to postgres;
+ALTER TABLE public.bambaswap_DEC_2024_data OWNER to postgres;
+
+
+COPY bambaswap_nov_2024_data
+FROM 'D:\MySQL\BAMBASWAP\bambaswap_analysis_2024\csv_data jan_sep_2024\NOV2024.csv'
 WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 
+COPY bambaswap_oct_2024_data
+FROM 'D:\MySQL\BAMBASWAP\bambaswap_analysis_2024\csv_data jan_sep_2024\DEC2024.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+CREATE TABLE bambaswap_combined_nov_dec_2024
+(
+    date TIMESTAMP,
+    phone_number TEXT,
+    amount_recieved INT,
+    amount_sent NUMERIC,
+    results_description TEXT,
+    device_name TEXT,
+    sessionID TEXT,
+    state TEXT,
+    trans_Type TEXT
+);
+
+INSERT INTO bambaswap_combined_nov_dec_2024
+SELECT * FROM bambaswap_nov_2024_data
+UNION ALL
+SELECT * FROM bambaswap_dec_2024_data;
+
+
 SELECT *
-FROM bambaswap_oct_2024_data
+FROM bambaswap_combined_nov_dec_2024
 
 --clean the phone_number column
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET phone_number = 
     -- 1. Remove all non-numeric characters (e.g., `+`, `-`, `(`, `)`, spaces)
     REGEXP_REPLACE(phone_number, '[^0-9]', '', 'g');
 
 SELECT *
-FROM bambaswap_oct_2024_data;
+FROM bambaswap_combined_nov_dec_2024;
 
 
 -- add columns, month, month number, week, quarter
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN time_only TIME,             -- Column for the time
 ADD COLUMN month VARCHAR(3),  -- Column for the month (3-letter format)
 ADD COLUMN month_number INT,           -- Column for the month number
@@ -43,7 +81,7 @@ ADD COLUMN quarter VARCHAR(2);         -- Column for the quarter (e.g., Q1, Q2)
 
 
 -- Update the table with the extracted time, month (3-letter), month number, week number by month, and quarter
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET 
     time_only = date ::TIME,                    -- Extract time portion
     month = TO_CHAR(date, 'Mon'),     -- 3-letter month name (e.g., Jan)
@@ -56,11 +94,11 @@ FROM bambaswap_oct_2024_data;
 
 
 -- add amount brackets
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN amt_bracket VARCHAR(20),
 ADD COLUMN bs_cost_bracket VARCHAR(20);
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET 
     amt_bracket = CASE 
         WHEN amount_recieved > 0 AND amount_recieved <= 49 THEN '0-49'
@@ -101,13 +139,13 @@ SET
 
 
 SELECT *
-FROM bambaswap_oct_2024_data;
+FROM bambaswap_combined_nov_dec_2024;
 
 -- add expenditure column
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN bs_expenditure NUMERIC(20);
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 
 SET bs_expenditure = CASE
             WHEN bs_cost_bracket LIKE '0-49' THEN 0
@@ -133,31 +171,31 @@ SET bs_expenditure = CASE
 
 
 SELECT *
-FROM bambaswap_oct_2024_data;
+FROM bambaswap_combined_nov_dec_2024;
 
 
 -- add revenue column
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN bs_revenue NUMERIC(20);
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET bs_revenue = amount_recieved - amount_sent
 WHERE
     trans_type LIKE 'AIRTIME';
 
 SELECT *
-FROM bambaswap_oct_2024_data;
+FROM bambaswap_combined_nov_dec_2024;
 
 -- add time bracket column
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD time_bracket VARCHAR(20);
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN time_bracket TEXT;
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET time_bracket = CASE
     WHEN EXTRACT(HOUR FROM time_only) BETWEEN 0 AND 5 THEN '00:00 - 05:59'
     WHEN EXTRACT(HOUR FROM time_only) BETWEEN 6 AND 11 THEN '06:00 - 11:59'
@@ -167,38 +205,38 @@ END;
 
 
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD week VARCHAR(20);
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET week = CONCAT('Week ', week_number_by_month);
 
 
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 DROP column week_number_by_month;
 
 SELECT *
-FROM bambaswap_oct_2024_data;
+FROM bambaswap_combined_nov_dec_2024;
 
 -- Step 1: Add a new column 'shiftS' to the table
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN shifts VARCHAR(20);
 
 
 
 -- Step 2: Update the 'shift' column based on the time brackets
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET shifts = CASE
     WHEN time_only >= '08:01:00' AND time_only <= '17:00:00' THEN 'Day Shift'
     WHEN time_only >= '17:01:00' OR time_only <= '08:00:00' THEN 'Night Shift'
     ELSE 'Unknown'  -- This handles any NULL or unexpected time values
 END;
 
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN day_type VARCHAR(10);
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET day_type = CASE 
     WHEN EXTRACT(DOW FROM date) IN (1, 2, 3, 4, 5) THEN 'Weekday'  -- Monday to Friday
     WHEN EXTRACT(DOW FROM date) IN (0, 6) THEN 'Weekend'          -- Saturday and Sunday
@@ -206,7 +244,7 @@ SET day_type = CASE
 END;
 
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET trans_type = CASE
     WHEN trans_type = 'CONVERSIONS' THEN 'CONVERSION' -- Keep as 'CONVERSIONS'
     WHEN trans_type = 'M2A' THEN 'AIRTIME'
@@ -215,25 +253,45 @@ SET trans_type = CASE
 END;
 
 -- insert date only column
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN date_only DATE;
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET date_only = date::DATE;
 
 -- insert a day column
-ALTER TABLE bambaswap_oct_2024_data
+ALTER TABLE bambaswap_combined_nov_dec_2024
 ADD COLUMN day_of_week VARCHAR(3);
 
 
-UPDATE bambaswap_oct_2024_data
+UPDATE bambaswap_combined_nov_dec_2024
 SET day_of_week = TO_CHAR(date_only, 'Dy');
 
 
 SELECT 
     *
 FROM 
-    bambaswap_oct_2024_data;
+    bambaswap_combined_nov_dec_2024;
 
-GROUP BY
-    month;
+SELECT *
+FROM bambaswap_combined_jan_oct_2024;
+
+
+
+ALTER TABLE bambaswap_combined_nov_dec_2024  
+DROP COLUMN date_only;
+
+-- insert date only column
+ALTER TABLE bambaswap_combined_nov_dec_2024
+ADD COLUMN date_only DATE;
+
+UPDATE bambaswap_combined_nov_dec_2024
+SET date_only = date::DATE;
+
+SELECT * INTO bambswap_2024_data
+FROM bambaswap_combined_jan_oct_2024
+union ALL
+SELECT * FROM bambaswap_combined_nov_dec_2024;
+
+SELECT *
+FROM bambswap_2024_data;
