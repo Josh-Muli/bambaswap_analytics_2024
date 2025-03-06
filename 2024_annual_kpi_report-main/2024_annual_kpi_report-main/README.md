@@ -1,8 +1,7 @@
-# BAMBASWAP 2024 ANNUAL KPI REPORT
+# BAMBASWAP ANNUAL KPI REPORT
 
-## 2024_KPi's
 
-### Period January to December 2024
+### Period: January to December 2024
 
 ## **Introduction**
 
@@ -54,7 +53,7 @@ Each query for this project aimed at investigating specific aspect of the SwapFi
 
 To calculate the **CAR** we utilized the formula:-
 
-$$
+$$ 
 \mathit{CAR} = \frac{\mathit{New\ Customers\ in\ a\ Month}}{\mathit{Total\ Customers\ up\ to\ Current\ Month\ }} \times 100
 $$
 
