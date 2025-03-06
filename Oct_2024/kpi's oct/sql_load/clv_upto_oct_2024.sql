@@ -1,7 +1,7 @@
 WITH monthly_revenue AS (
     -- Get total revenue per month
     SELECT month, month_number, SUM(bs_revenue) AS total_revenue, COUNT(DISTINCT phone_number) AS total_customers
-    FROM bambaswap_combined_jan_oct_2024
+    FROM bambaswap_2024_data
     GROUP BY month, month_number
 ),
 churn_data AS (
@@ -9,7 +9,7 @@ churn_data AS (
     WITH monthly_customers AS (
         -- Get distinct paying customers per month
         SELECT DISTINCT phone_number, month, month_number
-        FROM bambaswap_combined_jan_oct_2024
+        FROM bambaswap_2024_data
         
     ),
     previous_month_customers AS (
