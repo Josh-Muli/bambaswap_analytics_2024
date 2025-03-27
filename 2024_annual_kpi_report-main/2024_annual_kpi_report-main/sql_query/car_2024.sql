@@ -1,14 +1,14 @@
 WITH customer_transactions AS (
     -- Count transactions per customer
     SELECT phone_number, COUNT(*) AS transaction_count
-    FROM bambaswap_2024_data
+    FROM bambaswap_2023_data
     GROUP BY phone_number
     HAVING COUNT(*) > 1  -- Only customers with more than 1 transaction
 ),
 monthly_customers AS (
     -- Get unique customers per month (who made >1 transactions)
     SELECT DISTINCT c.phone_number, b.month, b.month_number
-    FROM bambaswap_2024_data b
+    FROM bambaswap_2023_data b
     JOIN customer_transactions c ON b.phone_number = c.phone_number
 ),
 existing_customers AS (
