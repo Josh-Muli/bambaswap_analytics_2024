@@ -1,16 +1,14 @@
-# BAMBASWAP 2023 ANNUAL KPI REPORT
+# BAMBASWAP KPI COMPARATIVE ANALYSIS REPORT
 
-## 2023_KPi's
-
-### Period January to December 2023
+## 2023 -2024
 
 ## **Introduction**
 
 The Bambaswap 2023 KPI Report provides a comprehensive analysis of the company’s key performance indicators (KPIs), focusing on customer acquisition, retention, churn, revenue trends, and overall business sustainability.
 
-This report aims to:
+This report aims to compare 2023 - 2024 through;-
 
-✅ Identify patterns in customer growth and engagement.
+✅ Identifing patterns in customer growth and engagement.
 
 ✅ Analyze revenue stability, customer lifetime value (CLV), and churn impact.
 
@@ -67,53 +65,30 @@ Where;-
 •	Multiplying by 100 converts it into a percentage.
 
 
-![BambaSwap Customer Acquisition Rate 2024](../../assets_graph_images/car_2024 graph.png)
+![BambaSwap Customer Acquisition Rate 2024](assets_graph_images\car_chart_2023-2024.jpg)
 
-*A powerBI generated waterfall graph showing the monthly changes in the average aquisition rates for BambaSwap in the year 2024.*
+*Here’s the comparative chart of BambaSwap’s Car Acquisition Rate (CAR) for 2023 vs. 2024.
+    🔵 2023 (Blue Line): Shows a steady decline throughout the year.
+    🔴 2024 (Red Line): Displays extreme volatility, with a massive February spike and a sharp decline after May.
+This visualization highlights the early-year surge, mid-year slump, and overall instability in 2024 compared to 2023*
 
-From the analysis and graph respesentation, the following conclusions can be drawn.
+From the analysis and graph respesentation, the following comparative conclusions can be drawn.
 
-**1️. Strong Customer Growth in Early Months (Jan–May)**
+    • 2024 saw an extreme spike in CAR to *270.85%* in **February**, compared to *81.00%* in **February 2023**.
 
-•	*January (90.69%)* and *February (270.85%)* had the **highest** CAR values, indicating a strong influx of new customers.
+    • This suggests a major growth initiative—possibly a new marketing campaign, expanded fleet, or external market conditions driving demand.
 
-•	*March (56.64%)* and *April (67.54%)* saw a **decline** but still had a healthy acquisition rate.
+1. Mid-Year Drop to 0% in Both Years 📉
+    •Acquisition rates fell to 0% by June-July in both 2023 and 2024, indicating a recurring seasonal trend.
+    •This could be due to low demand, funding constraints, or operational shifts.
+2. 2024 Showed More Extreme Volatility 📊
 
-•	*May (144.00%)* had another surge in new customers, suggesting a *successful campaign, product launch, or seasonal demand.*
+    •Unlike 2023's steady decline, 2024 had sharp fluctuations—peaking in **February (270.85%)** but then falling dramatically (e.g., *56.64%* in March, *0%* from **June** onward).
+    •This suggests unstable market conditions, inconsistent business strategy, or external disruptions affecting growth.
 
- ✔️ Possible reasons: Strong marketing efforts, promotions, or business expansion.
-
-**2️. Drastic Drop in New Customers from June Onward**
-
-•	*June to December* saw almost no new customer acquisitions, with CAR **dropping** to **0%** in multiple months.
-
-•	*July, September, October, November, and December* all recorded **0%** CAR, meaning **no new customers** were acquired.
-
-•	*August* had a tiny acquisition rate (0.93%), but it was insignificant compared to earlier months.
-
-**Possible reasons:**
-
-✔️ Market saturation (business already acquired most potential customers).
-
-✔️ Reduced marketing efforts.
-
-✔️ Customer churn could be outpacing acquisition.
-
-**3️. Business Shift: Retention Over Acquisition?**
-
-•	The complete lack of new customers in the second half of the year suggests a shift in strategy.
-
-•	If the business remained operational, it likely focused on retaining existing customers rather than acquiring new ones.
-
-•	A high churn rate combined with no new acquisitions could signal business stagnation.
-
-**Next Steps for Investigation:**
-
-✔️ Were there fewer marketing campaigns in the second half of the year?
-
-✔️ Did the business model change (e.g., shifting from acquisition to retention)?
-
-✔️ Was there an external market factor affecting customer acquisition (e.g., economic downturn, competition)?
+Conclusion on BambaSwap **Car Acquisition Rate (CAR)** Trends (2023 vs. 2024)
+BambaSwap’s CAR data for 2023 and 2024 reveals key patterns of growth, decline, and volatility. The massive **February 2024** spike *(270.85%)* suggests an aggressive expansion effort, but the steep drop to *0%* by mid-year in both years highlights a recurring challenge—possibly seasonal demand fluctuations or operational constraints.
+Compared to **2023’s steady decline**, 2024 exhibited **high volatility**, indicating either market instability, shifting business strategies, or external disruptions. To sustain long-term growth, BambaSwap should analyze the factors behind these fluctuations, address mid-year declines, and stabilize acquisition efforts throughout the year.
 
 ### **2. Customer Conversion Rate (C.C.R)**
 
@@ -143,85 +118,28 @@ What Insights Does This CCR Provide?
 
 • *Fluctuating CCR Trends* → Could indicate Bambaswap seasonal customer behavior or an issue with customer satisfaction.
 
-sql query used :-
+*Here is a visual comparison of BambaSwap's customer conversion rates for 2023 and 2024. You can see the early-year drop in 2024, the mid-year surge, and the sharp October decline compared to the more stable 2023 trend.*
 
-```sql
-WITH monthly_acquired_customers AS (
-    -- Get new customers acquired each month
-    SELECT DISTINCT phone_number, month, month_number
-    FROM bambaswap_2024_data
-),
-monthly_converted_customers AS (
-    -- Get customers who completed more than 3 transactions in a given month
-    SELECT phone_number, month, month_number
-    FROM bambaswap_2024_data
-    WHERE state = 'complete'
-    GROUP BY phone_number, month, month_number
-    HAVING COUNT(*) > 3  -- Only count customers with more than 3 completed transactions
-)
--- Calculate CCR per month
-SELECT 
-    ac.month, 
-    ac.month_number,
-    COALESCE(
-        ROUND(
-            COUNT(DISTINCT cc.phone_number) * 100.0 / NULLIF(COUNT(DISTINCT ac.phone_number), 0), 2
-        ), 0
-    ) AS conversion_rate_percentage
-FROM monthly_acquired_customers ac
-LEFT JOIN monthly_converted_customers cc 
-    ON ac.phone_number = cc.phone_number AND ac.month_number = cc.month_number
-GROUP BY ac.month, ac.month_number
-ORDER BY ac.month_number;
-```
-
-![BambaSwap Customer Conversion Rate 2024](../../assets_graph_images/ccr_2024 graph.png)
-
-*A powerBI generated waterfall graph showing the monthly BambaSwap average conversion rates for the year 2024*
+![BambaSwap Customer Conversion Rate 2024](assets_graph_images\ccr_chart_2023-2024.jpg)
 
 From the above customer conversion anaysis, the following conclusions were made :-
 
-**1️. Strong and Stable Conversion Performance in Mid-to-Late Year (Jun–Dec)**
+**1. Lower Conversion Rates in Early 2024 Compared to 2023 📉**
+    • The first five months of 2024 had significantly lower conversion rates (ranging from *13.51% to 22.26%*) compared to 2023’s much higher rates (*35.11% to 58.41%*).
+    • This suggests weaker customer engagement, ineffective marketing, or changes in customer behavior early in 2024.
 
-•	From *June to December*, the CCR consistently stayed above **59%**, peaking at **62.62%** in *June and November*.
+**2. Mid-to-Late Year Recovery in 2024 🔄**
+    • Conversion rates spiked in *June 2024 (62.62%)* and remained above *59%* for most of the second half, similar to 2023’s strong mid-year performance.
+    • This indicates a delayed but successful recovery, possibly due to seasonal factors or improved strategies.
 
-•	This suggests a *highly efficient conversion process*, meaning that once leads were generated, a majority converted into customers.
+**3. October 2024 Drop vs. 2023 Stability 📊**
+    • *October 2024* saw a sharp drop *(9.72%)*, whereas October 2023 remained stable at *58.93%*.
+    • This suggests an external disruption or internal business changes affecting conversions at that time.
 
-**Possible reasons:**
+Conclusion on BambaSwap Customer Conversion Rate Trends
+BambaSwap’s conversion rate in 2024 started weaker than 2023, indicating early-year challenges in customer acquisition or conversion strategies. However, mid-to-late year performance improved significantly, aligning with historical trends from 2023. The sharp October 2024 drop is an anomaly that should be investigated.
+To ensure sustained high conversion rates, BambaSwap should analyze what caused the early-year decline and October drop while reinforcing the factors that led to mid-year improvements.
 
-✔️ A more refined sales funnel or improved targeting strategies.
-
-✔️ Returning customers or strong brand loyalty.
-
-✔️ Seasonal factors or promotions driving high conversions.
-
-**2️. Lower Conversion Rates in Early Months (Jan–May)**
-
-•	*January to May* had significantly lower CCR values **(between 13% and 22%)**, meaning that more leads were generated but fewer converted.
-
-•	*February* had the highest early-year CCR **(22.26%)**, possibly due to strong post-January marketing efforts.
-
-**Possible reasons:**
-
-✔️ Higher competition or customer hesitation early in the year.
-
-✔️ New customer acquisition strategies that needed optimization.
-
-✔️ The business may have been focused more on acquiring customers than converting them.
-
-**3️. Sharp Drop in October (9.72%)**
-
-•	*October's* CCR plummeted to just **9.72%**, the lowest in the dataset.
-
-•	This suggests a major breakdown in conversion efficiency, meaning that even if leads were generated, very few became customers.
-
-**Possible reasons:**
-
-✔️ Change in marketing strategy or messaging failure.
-
-✔️ External factors (e.g., economic downturn, seasonal decline).
-
-✔️ Operational or service-related issues affecting customer trust.
 
 ### **3. Monthly Recurring Revenue (M.R.R)**
 
@@ -269,115 +187,29 @@ Where:
 
 • If **MRR** is *0* in a month with transactions → That month only had new customers (not returning ones).
 
-The sql query used :-
 
-```sql
-WITH monthly_revenue AS (
-    -- Get total revenue per customer per month
-    SELECT phone_number, month, month_number, SUM(bs_revenue) AS total_revenue
-    FROM bambaswap_2024_data
-    GROUP BY phone_number, month, month_number
-),
-previous_customers AS (
-    -- Identify customers who have paid in any month before or after the current month
-    SELECT DISTINCT mr1.phone_number, mr1.month, mr1.month_number
-    FROM monthly_revenue mr1
-    LEFT JOIN monthly_revenue mr2
-    ON mr1.phone_number = mr2.phone_number 
-    AND mr2.month_number < mr1.month_number  -- Customer has past payments
-    WHERE mr2.phone_number IS NOT NULL
-),
-recurring_customers AS (
-    -- Customers who made payments in previous months OR will make payments later
-    SELECT DISTINCT phone_number, month, month_number
-    FROM previous_customers
-    UNION
-    SELECT DISTINCT mr1.phone_number, mr1.month, mr1.month_number
-    FROM monthly_revenue mr1
-    JOIN monthly_revenue mr2
-    ON mr1.phone_number = mr2.phone_number 
-    AND mr1.month_number > mr2.month_number  -- Customer pays again later
-),
-mrr_per_month AS (
-    -- Calculate MRR per month
-    SELECT 
-        mr.month, 
-        mr.month_number,
-        COALESCE(SUM(mr.total_revenue), 0) AS monthly_recurring_revenue
-    FROM monthly_revenue mr
-    INNER JOIN recurring_customers rc 
-    ON mr.phone_number = rc.phone_number AND mr.month = rc.month
-    GROUP BY mr.month, mr.month_number
-)
--- Final MRR with % Change Calculation
-SELECT 
-    m1.month,
-    m1.month_number,
-    m1.monthly_recurring_revenue,
-    -- Calculate % Change from previous month
-    COALESCE(
-        ROUND(
-            ((m1.monthly_recurring_revenue - m2.monthly_recurring_revenue) * 100.0) 
-            / NULLIF(m2.monthly_recurring_revenue, 0), 2
-        ), 0
-    ) AS percent_change
-FROM mrr_per_month m1
-LEFT JOIN mrr_per_month m2 
-ON m1.month_number = m2.month_number + 1  -- Get previous month's MRR
-ORDER BY m1.month_number;
-```
+*A graph showing the 2023-2024 comparision changes Recurring Rate change for BambaSwap*
 
-![BambaSwap Recurring Revenue](../../assets_graph_images/recurring_revenue_2024.png)
+![BambaSwap Recurring Revenue](assets_graph_images\recurring_chart_2023-2024.jpg)
 
-![BambaSwap Recurring Revenue ](../../assets_graph_images/recurring_rate_2024.png)
+**1. 2023 Had More Extreme Volatility Compared to 2024 📉📈**
+    • 2023 saw massive spikes and crashes in MRR growth, such as *150.91%* in **May** and *-55.08%* in **July**.
+    • In contrast, 2024 showed a more gradual decline with smaller fluctuations, except for **November’s** sudden *109.17%* growth.
+    • This suggests 2023 had aggressive expansion efforts or external factors driving instability, whereas 2024 followed a more controlled trend.
 
-*A powerBI generated graph showing the monthly changes in monthly ARPU and Monthly Recurring Rate cchange for BambaSwap*
+**2. 2024 Showed a Steady MRR Decline Until November’s Surge 🔻📊**
+    • MRR declined consistently from **January** to **May** 2024, before showing modest recovery in mid-year and a sudden spike in **November** *(109.17%).*
+    • The November increase could indicate a major revenue boost—possibly from promotions, new product launches, or a change in business model.
 
-Here are three main summary insights from the Monthly Recurring Revenue (MRR) data for Bambaswap from the year 2024:-
+**3. 2023's Mid-Year Growth Was Unsustainable ⚠️**
+    • In 2023, MRR skyrocketed in **May** *(150.91%)* and **August** *(114.02%)*, but these gains were not sustained.
+    • Sharp drops followed *(-51.57% in June, -55.08% in July)*, showing instability.
+    • In comparison, 2024’s revenue movements were more controlled, with fewer dramatic shifts.
 
-1️. **Strong Growth in Early & Late Year, But Inconsistent Revenue Trends**
+Conclusion on BambaSwap’s MRR Trends (2023 vs. 2024)
+BambaSwap’s 2023 revenue saw extreme fluctuations, suggesting rapid expansion followed by major contractions. In contrast, 2024 had a more stable but declining trend, with a significant November spike.
+To ensure consistent revenue growth, BambaSwap should analyze the November 2024 spike to replicate its success, while also identifying the root causes of early-year declines. Avoiding the aggressive expansion-collapse cycle of 2023 will help create long-term financial stability.
 
-•	*March* **(51.54%)** and *November* **(134.42%)** saw the biggest revenue spikes.
-
-o *March's* jump suggests a successful expansion, campaign, or new customer sign-ups.
-
-o *November's* **134.42%** surge is massive—possibly a seasonal effect, major sales event, or high customer acquisition.
-
-• Several months *(April, May, September, October, December)* had revenue drops, signaling inconsistent retention or business slowdowns.
-
-**Possible reasons:**
-
-✔️ March & November had strong acquisition strategies or promotions.
-
-✔️ Some months saw higher churn or lost contracts.
-
-✔️ Business might be seasonally affected, depending on the industry.
-
-**2️. Periods of Revenue Decline Indicate Retention Challenges**
-
-•	*April* **(-1.69%)**, *May* **(-9.96%)**, *September* **(-8.60%)**, *October* **(-5.50%)**, and *December* **(-13.34%)** all had declining MRR.
-
-•	*December’s* **-13.34%** drop after a strong November suggests high churn, meaning many customers did not renew.
-
-**Possible reasons:**
-
-✔️ Customers are leaving faster than being acquired.
-
-✔️ Seasonal slowdowns in some months.
-
-✔️ Pricing changes or customer dissatisfaction.
-
-**3️. Missing Data for June Shows a Potential Gap in Revenue Tracking or Business Pause**
-
-•	There is no data for *June, and July’s* revenue is lower than *May*, suggesting either:
-
-o	A reporting gap (data missing for *June*).
-
-o	A temporary pause in business activity or revenue reporting.
-
- Action Required:
-
-✔️ Confirm if June data is missing or if the business had zero revenue that month.
 
 ### **4. Monthly Retention Rate (M.R.R)**
 
@@ -409,114 +241,34 @@ Where:
 
 • Seasonal Retention Trends → If retention fluctuates, it could be due to seasonal demand or product changes.
 
-Query used was to calculate the **MRR** is:-
+*Here is the visual representation of customer retention rates for 2023 and 2024.
+    • 2023 shows a steady retention rate above 50%, remaining strong throughout the year.
+    • 2024 has high volatility, with zero retention in some months and sudden spikes in others.
+This highlights customer retention instability in 2024, which may indicate issues with customer engagement, satisfaction, or external market factors.*
 
-```sql
-WITH monthly_customers AS (
-    -- Get distinct paying customers per month
-    SELECT DISTINCT phone_number, month, month_number
-    FROM bambaswap_2024_data
-),
-previous_month_customers AS (
-    -- Count total customers in the previous month
-    SELECT mc1.month AS previous_month, 
-           mc1.month_number AS previous_month_number, 
-           COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
-    FROM monthly_customers mc1
-    GROUP BY mc1.month, mc1.month_number
-),
-returning_customers AS (
-    -- Count returning customers (who paid in `m-1` and are still paying in `m`)
-    SELECT mc2.month AS current_month, 
-           mc2.month_number AS current_month_number, 
-           COUNT(DISTINCT mc2.phone_number) AS returning_customers
-    FROM monthly_customers mc2
-    LEFT JOIN monthly_customers mc1  -- Use LEFT JOIN to keep all records
-    ON mc2.phone_number = mc1.phone_number
-    AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
-    GROUP BY mc2.month, mc2.month_number
-)
--- Calculate Monthly Retention Rate as a Percentage
-SELECT 
-    pm.previous_month,
-    pm.previous_month_number,
-    COALESCE(rc.current_month, 'No Returning Customers') AS current_month,
-    COALESCE(rc.current_month_number, pm.previous_month_number + 1) AS current_month_number,
-    -- Calculate Retention Rate as a Percentage, avoiding division by zero
-    COALESCE(ROUND((rc.returning_customers * 100.0 / NULLIF(pm.total_previous_customers, 0)), 2), 0) AS retention_rate_percentage
-FROM previous_month_customers pm
-LEFT JOIN returning_customers rc 
-ON pm.previous_month_number + 1 = rc.current_month_number
-ORDER BY pm.previous_month_number;
-```
+![BambaSwap Retention Rate 2024](assets_graph_images\retention_rate_2023-2024.jpg)
 
-![BambaSwap Retention Rate 2024](../../assets_graph_images/retention_rate_2024.png)
+Here are the main insights drawn from the analyzed comparative BambaSwap Retention Rate.
 
-*A powerBI generated graph showing BambaSwap 2024 changes in Retention Rate*
+**1. Drastic Drop in Retention Rate in 2024**
+    • In 2023, retention rates remained consistently high, mostly above *50%,* and even peaking at *98.20%* in **July.**
+    • In 2024, retention rates were highly volatile, with *0%* recorded in **January, June, October, and November**, and massive fluctuations elsewhere *(e.g., 97.20% in July, 99.07% in September)*.
+    • This suggests inconsistency in customer engagement or possible operational challenges in 2024.
 
-Here are the main insights drawn from the analyzed BambaSwap Retention Rate.
+**2. Sudden Spikes in Mid and Late 2024**
+    • While 2024 started with low retention, July, August, and September saw a dramatic recovery, with retention rates exceeding 95%.
+    • This could be due to strategic changes, improved customer incentives, or seasonal demand variations.
+    
+**3. Retention Stability in 2023 vs. Unpredictability in 2024**
+    • 2023 showed a gradual increase in retention rates, peaking in **June** *(96.46%)* and **July** *(98.20%)*, with an overall steady customer base.
+    • 2024, in contrast, had extreme fluctuations, possibly indicating customer dissatisfaction, pricing changes, or service disruptions.
 
-**1️. Poor Retention in Early Months (Jan–May) Suggests High Churn**
+Conclusion
+• 2023 demonstrated strong customer retention, reflecting stable service quality and customer satisfaction.
+• 2024's inconsistent retention rates highlight operational challenges, requiring in-depth analysis to identify the causes of sharp drops and sudden spikes.
+• Addressing customer churn and enhancing service consistency will be critical to improving retention stability in the coming months.
 
-•	*January* **(8.85%)** and *February* **(10.41%)** had very low retention, meaning almost 90% of customers churned each month.
-
-•	*March* **(34.82%)** and *April* **(33.14%)** saw some improvement, but still, over 65% of customers left each month.
-
-•	*May* **(0%)** indicates a complete customer reset, meaning no customers continued into *June.*
-
-**Possible reasons:**
-
-✔️ **High customer churn** → Customers may not be satisfied with the service.
-
-✔️ **Short-term engagement** → Business might rely on one-time purchases rather than long-term users.
-
-✔️ **Marketing gaps** → Business may be acquiring customers but failing to retain them.
-
-This is a critical problem → BambaSwap is not holding onto early customers, leading to repeated revenue loss.
-
-**2️. Strong Retention in Mid-Year (Jun–Sep) Suggests Business Recovery.**
-
-•	*June* **(97.2%)**, *July* **(95.41%)**, *August* **(99.07%)** had excellent retention.
-
-•	This suggests a shift in business strategy, where customers were more engaged, loyal, or locked into a longer-term commitment.
-
-**Possible reasons:**
-
-✔️ Improved service quality, pricing, or customer experience.
-
-✔️ Long-term contracts, subscriptions, or retention incentives.
-
-✔️ Returning customers who left earlier in the year but rejoined in mid-year.
-
- This period is crucial! → BambaSwap finally retained customers well, and strategies used here should be analyzed for long-term success.
-
-**3️. Severe Drop-offs in September, October & December Show Long-Term Retention Issues.**
-
-•	*September* **(0%)** and *October* **(0%)** indicate a complete loss of customers → Whatever caused high retention earlier suddenly failed.
-
-•	*December* **(0%)** suggests no customers carried into the next year, meaning the business had no loyal base left by year-end.
-
-**Possible reasons:**
-
-✔️ Short-term engagement model (customers only stay for a few months).
-
-✔️ No renewal strategy.
-
-✔️ Seasonality effects → campaign that sells well in mid-year but loses demand later.
-
-Major Warning: The BambaSwap failed to sustain its mid-year retention success, leading to a complete wipeout of customers in key months.
-
-### **5. Monthly Churn Rate (R.R)**
-
-**Churn Rate** measures the percentage of Bambaswap customers who stop paying from one month to the next. It is the opposite of Retention Rate.
-
-• If Retention Rate is high, Churn Rate is low → Business is retaining customers well.
-
-• If Churn Rate is high, it means many customers are leaving the service.
-
-To calculate the **Churn Rate**, use the following formula:
-
-### **5. Monthly Churn Rate (R.R)**
+### **5. Monthly Churn Rate (C.R)**
 
 **Churn Rate** measures the percentage of Bambaswap customers who stop paying from one month to the next. It is the opposite of Retention Rate.
 
@@ -548,101 +300,31 @@ Where:
 
 Here is the sql query used for the churn rate;-
 
-```sql
-WITH monthly_customers AS (
-    -- Get distinct paying customers per month
-    SELECT DISTINCT phone_number, month, month_number
-    FROM bambaswap_2024_data
-),
-previous_month_customers AS (
-    -- Count total customers in the previous month
-    SELECT mc1.month AS previous_month, 
-           mc1.month_number AS previous_month_number, 
-           COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
-    FROM monthly_customers mc1
-    GROUP BY mc1.month, mc1.month_number
-),
-returning_customers AS (
-    -- Count returning customers (who paid in `m-1` and are still paying in `m`)
-    SELECT mc2.month AS current_month, 
-           mc2.month_number AS current_month_number, 
-           COUNT(DISTINCT mc2.phone_number) AS returning_customers
-    FROM monthly_customers mc2
-    JOIN monthly_customers mc1
-    ON mc2.phone_number = mc1.phone_number
-    AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
-    GROUP BY mc2.month, mc2.month_number
-)
--- Calculate Monthly Churn Rate
-SELECT 
-    pm.previous_month,
-    pm.previous_month_number,
-    COALESCE(rc.current_month, 'No Returning Customers') AS current_month,
-    COALESCE(rc.current_month_number, pm.previous_month_number + 1) AS current_month_number,
-    -- Churn Rate = (Total Customers in `m-1` - Returning Customers in `m`) / Total Customers in `m-1`
-    COALESCE(((pm.total_previous_customers - COALESCE(rc.returning_customers, 0)) * 100.0 / 
-              GREATEST(pm.total_previous_customers, 1)), 0) AS churn_rate
-FROM previous_month_customers pm
-LEFT JOIN returning_customers rc 
-ON pm.previous_month_number + 1 = rc.current_month_number
-ORDER BY pm.previous_month_number;
-```
+*Here is the churn rate comparison for 2023 and 2024. The blue line represents 2023, while the red dashed line represents 2024.*
 
-![BambaSwap Churn Rate](../../assets_graph_images/churn_rate_2024.png)
-
-*A powerBI generated graph showing the monthly changes in Monthly Churn Rate*
+![BambaSwap Churn Rate](assets_graph_images\churn_rate_2023-2024.jpg)
 
 BambaSwap churn Rate insight from the above analysis ;-
 
-**1️. Extremely High Churn in Early Months (Jan–May)**
+**1. Churn Rate Volatility in 2024**
+    • Unlike 2023, which had a gradual decline in churn rate until **December** (except for a spike in the last month), 2024 experienced extreme fluctuations.
+    • Some months in 2024 recorded a *100%* churn rate **(June, October, and December)**, indicating complete customer turnover in those months.
+    • The percentage change in churn rate is highly unstable, showing significant negative and positive swings, which suggests customer retention challenges or operational inconsistencies.
 
-•	*January* **(91.15%)** and *February* **(89.59%)** had massive churn, meaning almost 90% of customers left every month.
+**2. Lower and More Stable Churn in 2023**
+    • In 2023, churn started high in **February** *(47.34%)* and **March** *(45.36%)* but gradually declined throughout the year.
+    • The lowest churn rate was observed between **May and November** *(below 10%)*, implying strong customer retention efforts before a sudden peak in **December** *(99.07%)*.
+    • This trend indicates improved customer loyalty as the year progressed, with predictable customer behavior compared to 2024.
 
-•	*March* **(65.18%)** and *April* **(66.86%)** showed some improvement, but churn was still dangerously high.
+**3. Critical Customer Retention Issues in 2024**
+    • The sharp rise and fall in churn rate indicate instability in customer engagement strategies.
+    • The sudden **100%** churn in multiple months suggests periods of total customer loss, which could be due to external disruptions, service discontinuation, or drastic policy changes.
+    • Unlike 2023, which had a gradual improvement in retention, 2024 lacks consistency, making it difficult to maintain long-term customer relationships.
 
-•	*May* hit **100%** churn, meaning all customers left and zero carried over to June.
-
-**Possible reasons:**
-
-✔️ **Short-term customer engagement** – Customers might be using the BambaSwap service once and leaving.
-
-✔️ **Lack of retention strategies** – No incentives for customers to stay longer.
-
-✔️ **Poor onboarding or service experience** – Customers may not see long-term value.
-
-This is a serious issue → The business is losing customers faster than acquiring them in the early months.
-
-**2️. Strong Retention Mid-Year (Jun–Sep)**
-
-•	*June* **(2.80%)**, *July* **(4.59%)**, and *August* **(0.93%)** had low churn, meaning almost all customers stayed.
-
-•	This suggests a successful retention strategy or a long-term customer commitment.
-
-**Possible reasons:**
-
-✔️ Successful engagement strategies introduced in June.
-
-✔️ BambaSwap longterm Customers reduced churn temporarily.
-
-✔️ Better customer satisfaction or loyalty in mid-year.
-
-This was a key recovery period – BambaSwap managed to retain most of its customers after the initial high churn.
-
-**3️. Churn Spikes Again in Late-Year (Sep–Dec)**
-
-•	*September, October, and December* hit **100%** churn, meaning no customers stayed for the next month.
-
-•	This completely wiped out the customer base, leading to zero retention beyond December.
-
-**Possible reasons:**
-
-✔️ BambaSwap lacks renewal strategy.
-
-✔️ Customers only engaged for a short period (mid-year success was temporary).
-
-✔️ Service ended, pricing changed, or market demand shifted.
-
-**Major Red Flag:** This shows the business failed to sustain retention efforts beyond mid-year.
+Conclusion
+• 2023 had a more predictable and stable churn rate, showing gradual improvement in customer retention strategies.
+• 2024 is highly volatile, with sudden spikes in churn and drastic fluctuations in percentage change. This instability suggests critical customer retention challenges, which could be due to service issues, external market disruptions, or ineffective customer engagement strategies.
+• Urgent action is needed in 2024 to stabilize customer retention and reduce extreme churn fluctuations.
 
 ### **6. Customer Lifetime Value (CLV)**
 
@@ -664,171 +346,30 @@ where:
 
 • **Churn Rate:** The percentage of customers who did not return in the following month.
 
-The below query was utilized to calculate the CLV
+*Here is the CLV comparison for 2023 vs. 2024. The blue line represents 2023, showing consistently high CLV, while the red dashed line for 2024 shows a sharp drop early in the year, followed by a late-year increase.*
 
-```sql
-WITH monthly_revenue AS (
-    -- Get total revenue per month
-    SELECT month, month_number, SUM(bs_revenue) AS total_revenue, COUNT(DISTINCT phone_number) AS total_customers
-    FROM bambaswap_2024_data
-    GROUP BY month, month_number
-),
-churn_data AS (
-    -- Get churn rate per month (from previous churn rate query)
-    WITH monthly_customers AS (
-        -- Get distinct paying customers per month
-        SELECT DISTINCT phone_number, month, month_number
-        FROM bambaswap_2024_data
-    
-    ),
-    previous_month_customers AS (
-        -- Count total customers in the previous month
-        SELECT mc1.month AS previous_month, 
-               mc1.month_number AS previous_month_number, 
-               COUNT(DISTINCT mc1.phone_number) AS total_previous_customers
-        FROM monthly_customers mc1
-        GROUP BY mc1.month, mc1.month_number
-    ),
-    returning_customers AS (
-        -- Count returning customers (who paid in `m-1` and are still paying in `m`)
-        SELECT mc2.month AS current_month, 
-               mc2.month_number AS current_month_number, 
-               COUNT(DISTINCT mc2.phone_number) AS returning_customers
-        FROM monthly_customers mc2
-        JOIN monthly_customers mc1
-        ON mc2.phone_number = mc1.phone_number
-        AND mc2.month_number = mc1.month_number + 1  -- Ensures they paid in both `m-1` and `m`
-        GROUP BY mc2.month, mc2.month_number
-    )
-    -- Calculate Monthly Churn Rate
-    SELECT 
-        pm.previous_month,
-        pm.previous_month_number,
-        rc.current_month,
-        rc.current_month_number,
-        -- Churn Rate = (Total Customers in `m-1` - Returning Customers in `m`) / Total Customers in `m-1`
-        COALESCE(((pm.total_previous_customers - COALESCE(rc.returning_customers, 0)) * 1.0 / 
-                  GREATEST(pm.total_previous_customers, 1)), 0) AS churn_rate
-    FROM previous_month_customers pm
-    LEFT JOIN returning_customers rc 
-    ON pm.previous_month_number + 1 = rc.current_month_number
-)
--- Calculate CLV per month
-SELECT 
-    mr.month, 
-    mr.month_number,
-    (mr.total_revenue * 1.0 / NULLIF(mr.total_customers, 0)) AS ARPU,  -- Avoid division by zero
-    cd.churn_rate,
-    CASE 
-        WHEN cd.churn_rate = 0 THEN NULL  -- Prevent division by zero
-        ELSE (mr.total_revenue / NULLIF(mr.total_customers, 0)) * (1.0 / cd.churn_rate)
-    END AS customer_lifetime_value
-FROM monthly_revenue mr
-LEFT JOIN churn_data cd 
-ON mr.month_number = cd.previous_month_number
-ORDER BY mr.month_number;
-```
+![BambaSwap CLV & ARPU 2024](assets_graph_images\cvl_2023-2024.jpg)
 
-![BambaSwap CLV & ARPU 2024](../../assets_graph_images/clv_2024.png)
 
-*A powerBI generated graph showing the monthly changes in ARPU and Customer Lifetime Value*
+**1. Drastic Drop in Customer Lifetime Value (CLV) from 2023 to 2024**
+    • In 2023, CLV was consistently high, peaking at *ksh. 172,473.93* in **May** and remaining above *ksh. 30,000* in most months.
+    • In 2024, CLV saw a sharp decline, dropping below *ksh. 500* except for **June to December**, with the highest at *ksh. 21,982.81* in **November**—a massive shift.
+    • This suggests a major change in revenue structure, customer retention, or a shift in business strategy.
+**2. Customer Base Shift: Fewer Customers with Higher CLV in Late 2024**
+    • Early 2024 had thousands of customers *(e.g., ksh. 5,210 in January)*, but CLV was very low compared to 2023.
+    • Mid to late 2024 **(June–December)** saw only *~100-112 customers* per month, but CLV spiked dramatically *(e.g., ksh.21,982.81 in November)*.
+    • This suggests a shift from mass-market, low-value customers to a high-value, exclusive customer base.
+**3. Revenue Decline but Stabilization in 2024**
+    • In 2023, revenue fluctuated widely, peaking at *ksh. 5.14M* in **May** and then dropping.
+    • 2024 revenue was much lower and more stable, except for **November** and **December**, which saw spikes.
+    • This could indicate a change in pricing models, customer contracts, or a reduction in service offerings.
 
-**1️. CLV and ARPU Fluctuate Wildly, Indicating an Inconsistent Revenue Model**
+Conclusion
+• Bambaswap underwent a major shift in customer strategy from 2023 to 2024.
+• 2023 was **high-revenue, high-CLV**, but with a smaller customer base.
+• 2024 started with mass customers at low CLV but pivoted mid-year to fewer, high-value customers.
+• Revenue became more stable in 2024 but remains lower than 2023 overall.
 
-•	**ARPU (Average Revenue Per User)** and **CLV (Customer Lifetime Value)** are highly unstable, showing extreme peaks and drops.
+## CONCLUSION
+BambaSwap’s performance trends in 2023 and 2024 reveal critical insights into customer acquisition, engagement, and revenue stability. While 2023 showed steady declines and predictable patterns, 2024 experienced extreme volatility, indicating operational and market uncertainties. The sharp fluctuations in retention and churn rates, combined with inconsistent revenue trends, highlight the need for a more stable customer engagement strategy. To ensure long-term growth, BambaSwap must address seasonal demand fluctuations, improve customer retention efforts, and maintain a consistent acquisition strategy to avoid the extreme swings observed in 2024. Strengthening these areas will enhance business sustainability and drive predictable, long-term success.
 
-•	*June* **(ARPU: $8001.49, CLV: $285,386.67)** and *November* **(ARPU: ksh.15,840.60, CLV: ksh.338,988.80)** saw massive revenue spikes, suggesting high-value customers during these months.
-
-•	However, *May, September, October, and December* all dropped to extremely low values.
-
-**Possible reasons:**
-
-✔️ BambaSwap may have a mix of high-paying and low-paying customers, leading to erratic revenue.
-
-✔️ Short-term contracts or seasonal purchases could explain revenue surges followed by collapses.
-
-✔️ Shows BambaSwap might rely on a few big customers rather than a stable user base.
-
-**2️. Extremely High Churn in Certain Months Suggests Retention Issues**
-
-•	*May, September, October, and December* all had 100% churn, meaning every single customer left those months.
-
-•	This completely wiped out **customer lifetime value (CLV)** in those months.
-
-•	Months with low churn (*June*: **2.80%**, *August*: **0.93%**, *November*: **4.67%**) had much higher CLV, showing the direct impact of retention on customer profitability.
-
-**Possible reasons:**
-
-✔️ BambaSwap failed to retain customers beyond a short period.
-
-✔️ Certain months may represent one time customers.
-
-✔️ Customers aren’t seeing long-term value, leading to repeated churn spikes.
-
-**Critical Warning:** The business is heavily reliant on short bursts of high-revenue customers, but failing to maintain them long-term.
-
-**3️. CLV is Strong in Certain Months, Indicating a Selective Customer Base**
-
-•	*August* **(ksh.837,088.99)** and *November* **(ksh.338,988.80)** had exceptionally high CLV, meaning customers acquired in those months generated long-term revenue.
-
-•	These months also had low churn, proving that longer customer retention significantly boosts revenue.
-
-**Possible reasons:**
-
-✔️ Premium customers acquired in *August* & *November* may have had long-term value.
-
-✔️ Strategic pricing or marketing efforts may have locked in high-value customers.
-
-✔️ If this pattern is predictable, BambaSwap should focus on replicating the strategies that worked during these months.
-
-# **Conclusion**
-
-**1️. Inconsistent Revenue & Customer Lifetime Value (CLV) Pose Sustainability Risks**
-
-**ARPU** and ****CLV** fluctuated drastically, with massive spikes in *June, August, and November* but complete collapses in *May, September, October, and December*.
-
-High-value customers contributed significantly during peak months, but the business struggled to sustain a stable revenue base.
-
-This suggests over-reliance on short-term, high-spending customers instead of a consistently growing user base.
-
-**Action Needed:** Implement more stable pricing models, customer loyalty programs, or subscription-based services to smooth revenue inconsistencies.
-
-**2️. Severe Retention & Churn Issues Threaten Long-Term Growth.**
-
-**Churn** hit **100%** in multiple months *(May, September, October, December)*, completely erasing customer retention.
-Even months with high **CLV** *(August, November)* saw churn rise again shortly after, meaning the business isn’t holding onto customers long enough.
-
-The retention rate peaked mid-year *(June–September)*, suggesting short-term customer satisfaction but long-term disengagement.
-
-**Action Needed:**
-
-✔️ Improve customer engagement beyond the first few months through loyalty incentives and value-driven retention strategies.
-
-✔️ Investigate why customers leave after peak revenue months to prevent future churn cycles.
-
-**3️. Strong Performance in August & November Provides a Playbook for Growth**
-
-*August* and *November* saw high **CLV**, **low churn**, and **strong retention**, proving that effective retention strategies were in place during these months.
-
-The business should analyze what worked well in these periods—whether it was pricing adjustments, promotional offers, or improved customer experience.
-
-**Action Needed:**
-
-✔️ Replicate successful strategies from *August & November* year-round to improve customer retention.
-
-✔️ Shift focus from short-term gains to long-term customer engagement through tailored marketing and customer support improvements.
-
-**Final Takeaway: Urgent Need for Retention & Revenue Stabilization**
-
-**1️⃣ Revenue & CLV are unpredictable** → A more consistent pricing model is needed.
-
-**2️⃣ Churn spikes wipe out customer base** → Focus on customer retention & post-purchase engagement.
-
-**3️⃣ August & November show a winning formula** → Learn from these months and scale successful strategies across the year.
-
-**Next Steps:**
-**Deep dive into customer churn patterns** → What’s driving customers away?
-
-**Strengthen long-term engagement models** → How can Bambaswap keep customers beyond a few months?
-
-Standardize successful retention methods from high-performing months.
